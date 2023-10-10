@@ -1,9 +1,10 @@
 import "./globals.css"
 
 export const metadata = {
-	title: "highchat",
-	description: "send a message to your high school",
-	metadataBase: new URL("https://highchat.vercel.app"),
+	title: "mchsanonymous",
+	description:
+		"send and receive anonymous messages from people at your school",
+	metadataBase: new URL("https://mchsanonymous.vercel.app"),
 }
 
 export default function RootLayout({

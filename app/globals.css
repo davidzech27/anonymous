@@ -36,10 +36,4 @@
 	html {
 		scrollbar-color: #ffffff4a transparent;
 	}
-
-	@media only screen and (max-width: 768px) {
-  		html {
-    		font-size: 12px;
-    	}
-	}
 }

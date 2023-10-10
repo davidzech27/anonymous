@@ -62,8 +62,8 @@ export default function Landing({ initialUserCount }: Props) {
 	})
 
 	return (
-		<main className="flex h-screen flex-col items-center justify-center bg-primary">
-			<h1 className="text-4xl font-bold text-secondary">
+		<main className="flex h-screen flex-col items-center justify-center bg-primary p-6">
+			<h1 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">
 				send and receive anonymous messages from people at your school
 			</h1>
 
@@ -110,7 +110,7 @@ export default function Landing({ initialUserCount }: Props) {
 
 			<div className="pt-8" />
 
-			<h2 className="text-4xl font-bold text-secondary">
+			<h2 className="text-4xl font-bold text-secondary mobile:text-2xl">
 				{userCount} already here
 			</h2>
 
@@ -118,7 +118,7 @@ export default function Landing({ initialUserCount }: Props) {
 
 			{lastJoinedUser && (
 				<div
-					className="text-lg font-bold text-secondary"
+					className="text-lg font-bold text-secondary mobile:text-2xl"
 					aria-live="polite"
 				>
 					{lastJoinedUser.firstName} {lastJoinedUser.lastName} just

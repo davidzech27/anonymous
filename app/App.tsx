@@ -400,141 +400,226 @@ export default function App({
 		}, []),
 	})
 
+	const [screen, setScreen] = useState<"anonymous" | "main" | "known">("main")
+
 	return (
-		<main className="flex h-screen space-x-3 bg-primary p-6">
-			<div className="w-[calc(25vw)] space-y-3 overflow-y-auto overflow-y-auto rounded-lg border border-white p-3">
-				{anonymousConversations.map((conversation) => (
+		<div className="flex h-screen flex-col bg-primary">
+			<nav className="hidden px-6 pt-1 mobile:flex">
+				<div className="flex-1 p-3 text-center">
 					<div
-						key={conversation.id}
-						onClick={() => setConversationId(conversation.id)}
+						onClick={() => setScreen("anonymous")}
 						role="button"
-						tabIndex={0}
 						className={cn(
-							"flex flex-col rounded-lg border border-white p-3 outline-none transition",
-							conversation.id === conversationId
-								? "bg-white/30"
-								: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
+							"text-lg font-bold text-white transition",
+							screen === "anonymous" && "opacity-50"
 						)}
 					>
-						<div className="text-lg font-bold leading-none text-secondary">
-							#{conversation.user.id}
-						</div>
-
-						<div className="pt-3" />
-
-						<p className="font-light text-white">
-							{conversation.messages
-								.at(-1)
-								?.content.slice(0, 100)}
-						</p>
-
-						<div className="pt-3" />
-
-						<div className="flex justify-end">
-							<span className="text-lg font-bold leading-none text-secondary">
-								{formatDuration(
-									conversation.messages.at(-1)?.sentAt ??
-										new Date()
-								)}
-							</span>
-						</div>
+						anonymous
 					</div>
-				))}
-			</div>
+				</div>
+
+				<div className="flex-1 p-3 text-center">
+					<div
+						onClick={() => setScreen("main")}
+						role="button"
+						className={cn(
+							"text-lg font-bold text-white transition",
+							screen === "main" && "opacity-50"
+						)}
+					>
+						{conversation !== undefined
+							? "firstName" in conversation.user
+								? conversation.user.firstName
+								: `#${conversation.user.id}`
+							: "users"}
+					</div>
+				</div>
+
+				<div className="flex-1 p-3 text-center">
+					<div
+						onClick={() => setScreen("known")}
+						role="button"
+						className={cn(
+							"text-lg font-bold text-white transition",
+							screen === "known" && "opacity-50"
+						)}
+					>
+						known
+					</div>
+				</div>
+			</nav>
 
 			<div
-				className="relative w-[calc(50vw-24px)] rounded-lg border border-white"
-				aria-live="polite"
-			>
-				{conversation === undefined ? (
-					<div className="space-y-3 overflow-y-auto p-3">
-						{users.map((user) => (
-							<div
-								key={user.id}
-								onClick={() => setDraftingUserId(user.id)}
-								role="button"
-								className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
-							>
-								<div className="text-lg font-bold leading-none text-secondary">
-									{user.firstName} {user.lastName}
+				className="relative flex w-screen flex-1 flex-col overflow-hidden">
+				<main className={cn("flex relative h-[calc(100vh-70px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pt-0", 					{
+					anonymous: "mobile:right-0",
+					main: "mobile:right-[100vw]",
+					known: "mobile:right-[200vw]",
+				}[screen]
+)}>
+					<div className="w-[25vw] space-y-3 overflow-y-auto overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
+						{anonymousConversations.length !== 0 ? (
+							anonymousConversations.map((conversation) => (
+								<div
+									key={conversation.id}
+									onClick={() => {
+										setConversationId(conversation.id)
+
+										setScreen("main")
+									}}
+									role="button"
+									tabIndex={0}
+									className={cn(
+										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
+										conversation.id === conversationId
+											? "bg-white/30"
+											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
+									)}
+								>
+									<div className="text-lg font-bold leading-none text-secondary">
+										#{conversation.user.id}
+									</div>
+
+									<div className="pt-3" />
+
+									<p className="font-light text-white">
+										{conversation.messages
+											.at(-1)
+											?.content.slice(0, 100)}
+									</p>
+
+									<div className="pt-3" />
+
+									<div className="flex justify-end">
+										<span className="text-lg font-bold leading-none text-secondary">
+											{formatDuration(
+												conversation.messages.at(-1)
+													?.sentAt ?? new Date()
+											)}
+										</span>
+									</div>
 								</div>
-
-								<div className="pt-3" />
-
-								<div className="flex justify-end">
-									<span className="text-lg font-bold leading-none text-secondary">
-										Joined {formatDuration(user.createdAt)}
-									</span>
-								</div>
-
-								<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100">
-									send an anonymous message
-								</div>
-							</div>
-						))}
-					</div>
-				) : (
-					<Conversation
-						user={conversation.user}
-						messages={conversation.messages}
-						onSend={
-							draftingUserId !== undefined
-								? onCreateConversation
-								: onSendMessage
-						}
-						onClose={
-							draftingUserId !== undefined
-								? () => setDraftingUserId(undefined)
-								: () => setConversationId(undefined)
-						}
-					/>
-				)}
-			</div>
-
-			<div className="w-[calc(25vw)] space-y-3 overflow-y-auto rounded-lg border border-white p-3">
-				{knownConversations.map((conversation) => (
-					<div
-						key={conversation.id}
-						onClick={() => setConversationId(conversation.id)}
-						role="button"
-						tabIndex={0}
-						className={cn(
-							"flex flex-col rounded-lg border border-white p-3 outline-none transition",
-							conversation.id === conversationId
-								? "bg-white/30"
-								: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
+							))
+						) : (
+							<p className="text-lg font-light text-white">
+								No one has started a conversation with you yet,
+								but this is where they&apos;ll appear.
+							</p>
 						)}
-					>
-						<div className="text-lg font-bold leading-none text-secondary">
-							{conversation.user.firstName}{" "}
-							{conversation.user.lastName}
-						</div>
-
-						<div className="pt-3" />
-
-						<p className="font-light text-white">
-							{conversation.messages.at(-1)?.me && (
-								<span className="text-white/50">Me: </span>
-							)}
-
-							{conversation.messages
-								.at(-1)
-								?.content.slice(0, 100)}
-						</p>
-
-						<div className="pt-3" />
-
-						<div className="flex justify-end">
-							<span className="text-lg font-bold leading-none text-secondary">
-								{formatDuration(
-									conversation.messages.at(-1)?.sentAt ??
-										new Date()
-								)}
-							</span>
-						</div>
 					</div>
-				))}
+
+					<div
+						className="relative w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]"
+						aria-live="polite"
+					>
+						{conversation === undefined ? (
+							<div className="space-y-3 overflow-y-auto p-3">
+								{users.map((user) => (
+									<div
+										key={user.id}
+										onClick={() =>
+											setDraftingUserId(user.id)
+										}
+										role="button"
+										className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
+									>
+										<div className="text-lg font-bold leading-none text-secondary">
+											{user.firstName} {user.lastName}
+										</div>
+
+										<div className="pt-3" />
+
+										<div className="flex justify-end">
+											<span className="text-lg font-bold leading-none text-secondary">
+												Joined{" "}
+												{formatDuration(user.createdAt)}
+											</span>
+										</div>
+
+										<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100">
+											send an anonymous message
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<Conversation
+								user={conversation.user}
+								messages={conversation.messages}
+								onSend={
+									draftingUserId !== undefined
+										? onCreateConversation
+										: onSendMessage
+								}
+								onClose={
+									draftingUserId !== undefined
+										? () => setDraftingUserId(undefined)
+										: () => setConversationId(undefined)
+								}
+							/>
+						)}
+					</div>
+
+					<div className=" w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
+						{knownConversations.length !== 0 ? (
+							knownConversations.map((conversation) => (
+								<div
+									key={conversation.id}
+									onClick={() => {
+										setConversationId(conversation.id)
+
+										setScreen("main")
+									}}
+									role="button"
+									tabIndex={0}
+									className={cn(
+										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
+										conversation.id === conversationId
+											? "bg-white/30"
+											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
+									)}
+								>
+									<div className="text-lg font-bold leading-none text-secondary">
+										{conversation.user.firstName}{" "}
+										{conversation.user.lastName}
+									</div>
+
+									<div className="pt-3" />
+
+									<p className="font-light text-white">
+										{conversation.messages.at(-1)?.me && (
+											<span className="text-white/50">
+												Me:{" "}
+											</span>
+										)}
+
+										{conversation.messages
+											.at(-1)
+											?.content.slice(0, 100)}
+									</p>
+
+									<div className="pt-3" />
+
+									<div className="flex justify-end">
+										<span className="text-lg font-bold leading-none text-secondary">
+											{formatDuration(
+												conversation.messages.at(-1)
+													?.sentAt ?? new Date()
+											)}
+										</span>
+									</div>
+								</div>
+							))
+						) : (
+							<p className="text-lg font-light text-white">
+								You haven&apos;t started any conversations with
+								anyone yet, but this is where they&apos;ll
+								appear.
+							</p>
+						)}
+					</div>
+				</main>
 			</div>
-		</main>
+		</div>
 	)
 }

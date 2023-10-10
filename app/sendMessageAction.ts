@@ -8,11 +8,29 @@ import db from "~/database/db"
 import { conversation, message } from "~/database/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
+import moderateContent from "~/ai/moderateContent"
 
 const sendMessageAction = zact(
 	z.object({ conversationId: z.number(), content: z.string().min(1) })
 )(async ({ conversationId, content }) => {
 	const auth = await getAuthOrThrow({ cookies })
+
+	const moderateContentPromise = moderateContent({
+		content,
+		categoryScoreThresholds: {
+			sexual: 0.95,
+			hate: 0.9,
+			harassment: 0.99,
+			"self-harm": 0.95,
+			"sexual/minors": 0.5,
+			"hate/threatening": 0.75,
+			"violence/graphic": 0.75,
+			"self-harm/intent": 0.95,
+			"self-harm/instructions": 0.95,
+			"harassment/threatening": 0.95,
+			violence: 0.95,
+		},
+	})
 
 	const sentAt = new Date()
 
@@ -32,6 +50,10 @@ const sendMessageAction = zact(
 		conversationRow.knownUserId !== auth.id
 	)
 		throw new Error("Not in conversation")
+
+	if ((await moderateContentPromise).flagged)
+		content =
+			"this message did not obey our content policy. remember to be nice!"
 
 	const [createdMessageRow] = await db
 		.insert(message)
@@ -61,7 +83,11 @@ const sendMessageAction = zact(
 		}
 	)
 
-	return { id: createdMessageRow.id }
+	return {
+		id: createdMessageRow.id,
+		content,
+		sentAt,
+	}
 })
 
 export default sendMessageAction

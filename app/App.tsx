@@ -138,9 +138,9 @@ export default function App({
 				user,
 				messages: [
 					{
-						id: newConversation.firstMessageId,
+						id: newConversation.firstMessage.id,
 						me: true,
-						content: input,
+						content: newConversation.firstMessage.content,
 						sentAt: newConversation.createdAt,
 					},
 				],
@@ -250,7 +250,7 @@ export default function App({
 							0,
 							optimisticMessageIndex
 						),
-						{ ...optimisticMessage, id: createdMessage.id },
+						{ ...optimisticMessage, ...createdMessage },
 						...conversation.messages.slice(
 							optimisticMessageIndex + 1
 						),
@@ -289,7 +289,7 @@ export default function App({
 							0,
 							optimisticMessageIndex
 						),
-						{ ...optimisticMessage, id: createdMessage.id },
+						{ ...optimisticMessage, ...createdMessage },
 						...conversation.messages.slice(
 							optimisticMessageIndex + 1
 						),
@@ -449,14 +449,17 @@ export default function App({
 				</div>
 			</nav>
 
-			<div
-				className="relative flex w-screen flex-1 flex-col overflow-hidden">
-				<main className={cn("flex relative h-[calc(100vh-70px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pt-0", 					{
-					anonymous: "mobile:right-0",
-					main: "mobile:right-[100vw]",
-					known: "mobile:right-[200vw]",
-				}[screen]
-)}>
+			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
+				<main
+					className={cn(
+						"relative flex h-[calc(100vh-70px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pt-0",
+						{
+							anonymous: "mobile:right-0",
+							main: "mobile:right-[100vw]",
+							known: "mobile:right-[200vw]",
+						}[screen]
+					)}
+				>
 					<div className="w-[25vw] space-y-3 overflow-y-auto overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
 						{anonymousConversations.length !== 0 ? (
 							anonymousConversations.map((conversation) => (

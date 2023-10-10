@@ -28,6 +28,7 @@
 		"eslint-plugin-react-hooks": "0.0.0-experimental-41f0e9dae-20230907",
 		"jose": "^4.15.2",
 		"next": "latest",
+		"openai-edge": "^1.2.2",
 		"postcss": "8.4.29",
 		"prettier": "2.8.1",
 		"prettier-plugin-tailwindcss": "^0.2.1",

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { desc, sql, eq, asc } from "drizzle-orm"
+import { desc, sql, eq } from "drizzle-orm"
 
 import db from "~/database/db"
 import { user, conversation, message } from "~/database/schema"

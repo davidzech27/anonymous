@@ -4,6 +4,8 @@ export const user = sqliteTable("user", {
 	id: integer("id").primaryKey(),
 	firstName: text("first_name").notNull(),
 	lastName: text("last_name").notNull(),
+	// invitedUsers: integer("invited_users").default(0).notNull(),
+	// revealedUsers: integer("revealed_users").default(0).notNull(),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 })
 

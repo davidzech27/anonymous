@@ -2,8 +2,19 @@ import { useRef, useState, useEffect } from "react"
 import formatDuration from "~/util/formatDuration"
 
 interface Props {
-	user: { firstName: string; lastName: string } | { id: number }
-	messages: { id: number; me: boolean; content: string; sentAt: Date }[]
+	user:
+		| {
+				firstName: string
+				lastName: string
+		  }
+		| { id: number }
+	messages: {
+		id: number
+		me: boolean
+		content: string
+		flagged: boolean
+		sentAt: Date
+	}[]
 	onSend: (input: string) => void
 	onClose: () => void
 }
@@ -93,9 +104,16 @@ export default function Conversation({
 									: `#${user.id}`}
 							</div>
 
-							<p className="break-words font-medium text-white">
-								{message.content}
-							</p>
+							{!message.flagged ? (
+								<p className="break-words font-medium text-white">
+									{message.content}
+								</p>
+							) : (
+								<p className="break-words font-medium text-white">
+									this message did not comply with our content
+									policy. remember to be nice!
+								</p>
+							)}
 
 							<div className="flex justify-end">
 								<span className="text-lg font-bold leading-none text-secondary">

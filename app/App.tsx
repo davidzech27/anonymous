@@ -26,6 +26,7 @@ interface Props {
 			id: number
 			me: boolean
 			content: string
+			flagged: boolean
 			sentAt: Date
 		}[]
 		createdAt: Date
@@ -33,6 +34,7 @@ interface Props {
 	initialKnownConversations: {
 		id: number
 		user: {
+			id: number
 			firstName: string
 			lastName: string
 		}
@@ -40,6 +42,7 @@ interface Props {
 			id: number
 			me: boolean
 			content: string
+			flagged: boolean
 			sentAt: Date
 		}[]
 		createdAt: Date
@@ -58,6 +61,7 @@ const conversationSchema = z.object({
 	firstMessage: z.object({
 		id: z.number(),
 		content: z.string(),
+		flagged: z.boolean(),
 	}),
 	createdAt: z.coerce.date(),
 })
@@ -66,6 +70,7 @@ const messageSchema = z.object({
 	id: z.number(),
 	conversationId: z.number(),
 	content: z.string(),
+	flagged: z.boolean(),
 	sentAt: z.coerce.date(),
 })
 
@@ -92,12 +97,14 @@ export default function App({
 	const conversation =
 		conversationId !== undefined
 			? {
-					user: knownConversations.find(
-						(conversation) => conversation.id === conversationId
-					)?.user ??
+					user: (
+						knownConversations.find(
+							(conversation) => conversation.id === conversationId
+						) ??
 						anonymousConversations.find(
 							(conversation) => conversation.id === conversationId
-						)?.user ?? { id: 0 },
+						)
+					)?.user,
 					messages:
 						knownConversations.find(
 							(conversation) => conversation.id === conversationId
@@ -141,6 +148,7 @@ export default function App({
 						id: newConversation.firstMessage.id,
 						me: true,
 						content: newConversation.firstMessage.content,
+						flagged: newConversation.firstMessage.flagged,
 						sentAt: newConversation.createdAt,
 					},
 				],
@@ -153,7 +161,7 @@ export default function App({
 	const [optimisticMessages, setOptimisticMessages] = useState(0)
 
 	const onSendMessage = async (input: string) => {
-		if (conversationId === undefined) return
+		if (conversationId === undefined || conversation === undefined) return
 
 		const optimisticId = optimisticMessages * -1 - 1
 
@@ -177,6 +185,7 @@ export default function App({
 						id: optimisticId,
 						me: true,
 						content: input,
+						flagged: false,
 						sentAt,
 					}),
 				},
@@ -203,6 +212,7 @@ export default function App({
 						id: optimisticId,
 						me: true,
 						content: input,
+						flagged: false,
 						sentAt,
 					}),
 				},
@@ -215,6 +225,8 @@ export default function App({
 
 		const createdMessage = await sendMessageAction({
 			conversationId,
+			// @ts-expect-error - not worth figuring out
+			userId: conversation.user.id,
 			content: input,
 		})
 
@@ -328,6 +340,7 @@ export default function App({
 							id: conversation.firstMessage.id,
 							me: false,
 							content: conversation.firstMessage.content,
+							flagged: conversation.firstMessage.flagged,
 							sentAt: conversation.createdAt,
 						},
 					],
@@ -364,6 +377,7 @@ export default function App({
 							id: message.id,
 							me: false,
 							content: message.content,
+							flagged: message.flagged,
 							sentAt: message.sentAt,
 						}),
 					},
@@ -390,6 +404,7 @@ export default function App({
 							id: message.id,
 							me: false,
 							content: message.content,
+							flagged: message.flagged,
 							sentAt: message.sentAt,
 						}),
 					},

@@ -10,6 +10,7 @@ const env = createEnv({
 		OPENAI_SECRET_KEY: z.string(),
 		SOKETI_APP_ID: z.string(),
 		SOKETI_APP_SECRET: z.string(),
+		DISCORD_WEBHOOK_URL: z.string().url(),
 	},
 	client: {
 		NEXT_PUBLIC_SOKETI_HOST: z.string(),
@@ -27,6 +28,7 @@ const env = createEnv({
 		SOKETI_APP_ID: process.env.SOKETI_APP_ID,
 		NEXT_PUBLIC_SOKETI_APP_KEY: process.env.NEXT_PUBLIC_SOKETI_APP_KEY,
 		SOKETI_APP_SECRET: process.env.SOKETI_APP_SECRET,
+		DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
 	},
 })
 

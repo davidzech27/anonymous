@@ -40,6 +40,7 @@ export default async function Index() {
 						id: message.id,
 						fromUserId: message.fromUserId,
 						content: message.content,
+						flagged: message.flagged,
 						sentAt: message.sentAt,
 					},
 				})
@@ -58,6 +59,7 @@ export default async function Index() {
 									id: number
 									me: boolean
 									content: string
+									flagged: boolean
 									sentAt: Date
 								}[]
 								createdAt: Date
@@ -80,6 +82,7 @@ export default async function Index() {
 												cur.message.fromUserId ===
 												auth.id,
 											content: cur.message.content,
+											flagged: cur.message.flagged,
 											sentAt: cur.message.sentAt,
 										},
 									],
@@ -98,6 +101,7 @@ export default async function Index() {
 										id: cur.message.id,
 										me: cur.message.fromUserId === auth.id,
 										content: cur.message.content,
+										flagged: cur.message.flagged,
 										sentAt: cur.message.sentAt,
 									}),
 								},
@@ -116,6 +120,7 @@ export default async function Index() {
 						createdAt: conversation.createdAt,
 					},
 					user: {
+						id: user.id,
 						firstName: user.firstName,
 						lastName: user.lastName,
 					},
@@ -123,6 +128,7 @@ export default async function Index() {
 						id: message.id,
 						fromUserId: message.fromUserId,
 						content: message.content,
+						flagged: message.flagged,
 						sentAt: message.sentAt,
 					},
 				})
@@ -136,11 +142,12 @@ export default async function Index() {
 						.reduce<
 							{
 								id: number
-								user: { firstName: string; lastName: string }
+								user: {id: number; firstName: string; lastName: string }
 								messages: {
 									id: number
 									me: boolean
 									content: string
+									flagged: boolean
 									sentAt: Date
 								}[]
 								createdAt: Date
@@ -154,6 +161,7 @@ export default async function Index() {
 								return prev.concat({
 									id: cur.conversation.id,
 									user: {
+										id: cur.user.id,
 										firstName: cur.user.firstName,
 										lastName: cur.user.lastName,
 									},
@@ -164,6 +172,7 @@ export default async function Index() {
 												cur.message.fromUserId ===
 												auth.id,
 											content: cur.message.content,
+											flagged: cur.message.flagged,
 											sentAt: cur.message.sentAt,
 										},
 									],
@@ -182,6 +191,7 @@ export default async function Index() {
 										id: cur.message.id,
 										me: cur.message.fromUserId === auth.id,
 										content: cur.message.content,
+										flagged: cur.message.flagged,
 										sentAt: cur.message.sentAt,
 									}),
 								},

@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core"
+import { sqliteTable, integer, text, primaryKey } from "drizzle-orm/sqlite-core"
 
 export const user = sqliteTable("user", {
 	id: integer("id").primaryKey(),
@@ -13,6 +13,8 @@ export const conversation = sqliteTable("conversation", {
 	id: integer("id").primaryKey(),
 	anonymousUserId: integer("anonymous_user_id").notNull(),
 	knownUserId: integer("known_user_id").notNull(),
+	// anonymousFirstName: text("anonymous_first_name"),
+	// anonymousLastName: text("anonymous_last_name"),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 })
 
@@ -21,5 +23,17 @@ export const message = sqliteTable("message", {
 	conversationId: integer("conversation_id").notNull(),
 	fromUserId: integer("from_user_id").notNull(),
 	content: text("content").notNull(),
+	flagged: integer("flagged", { mode: "boolean" }).default(false).notNull(),
 	sentAt: integer("sent_at", { mode: "timestamp" }).notNull(),
 })
+
+export const block = sqliteTable(
+	"block",
+	{
+		blockerUserId: integer("blocker_user_id"),
+		blockedUserId: integer("blocked_user_id"),
+	},
+	(table) => ({
+		primaryKey: primaryKey(table.blockerUserId, table.blockedUserId),
+	})
+)

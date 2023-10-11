@@ -2,17 +2,22 @@
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
 import db from "~/database/db"
-import { conversation, message } from "~/database/schema"
+import { conversation, message, block } from "~/database/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
+import discord from "~/discord/discord"
 
 const sendMessageAction = zact(
-	z.object({ conversationId: z.number(), content: z.string().min(1) })
-)(async ({ conversationId, content }) => {
+	z.object({
+		conversationId: z.number(),
+		userId: z.number(),
+		content: z.string().min(1),
+	})
+)(async ({ conversationId, userId, content }) => {
 	const auth = await getAuthOrThrow({ cookies })
 
 	const moderateContentPromise = moderateContent({
@@ -34,15 +39,35 @@ const sendMessageAction = zact(
 
 	const sentAt = new Date()
 
-	const [conversationRow] = await db
-		.select({
-			anonymousUserId: conversation.anonymousUserId,
-			knownUserId: conversation.knownUserId,
-		})
-		.from(conversation)
-		.where(eq(conversation.id, conversationId))
+	const [[conversationRow]] = await Promise.all([
+		db
+			.select({
+				anonymousUserId: conversation.anonymousUserId,
+				knownUserId: conversation.knownUserId,
+			})
+			.from(conversation)
+			.where(eq(conversation.id, conversationId)),
+		(async () => {
+			const [blockRow] = await db
+				.select()
+				.from(block)
+				.where(
+					and(
+						eq(block.blockedUserId, auth.id),
+						eq(block.blockerUserId, userId)
+					)
+				)
 
-	if (conversationRow === undefined)
+			if (blockRow !== undefined)
+				throw new Error("You're blocked by this user")
+		})(),
+	])
+
+	if (
+		conversationRow === undefined ||
+		(conversationRow.anonymousUserId !== userId &&
+			conversationRow.knownUserId !== userId)
+	)
 		throw new Error("Conversation does not exist")
 
 	if (
@@ -51,9 +76,15 @@ const sendMessageAction = zact(
 	)
 		throw new Error("Not in conversation")
 
-	if ((await moderateContentPromise).flagged)
-		content =
-			"this message did not obey our content policy. remember to be nice!"
+	const sendMessagePromise = discord.send(
+		`message sent ${JSON.stringify(
+			{ from: auth.id, conversationId, content },
+			null,
+			4
+		)}`
+	)
+
+	const flagged = (await moderateContentPromise).flagged
 
 	const [createdMessageRow] = await db
 		.insert(message)
@@ -61,6 +92,7 @@ const sendMessageAction = zact(
 			conversationId,
 			fromUserId: auth.id,
 			content,
+			flagged,
 			sentAt,
 		})
 		.returning({ id: message.id })
@@ -79,13 +111,17 @@ const sendMessageAction = zact(
 			id: createdMessageRow.id,
 			conversationId,
 			content,
+			flagged,
 			sentAt,
 		}
 	)
 
+	await sendMessagePromise
+
 	return {
 		id: createdMessageRow.id,
 		content,
+		flagged,
 		sentAt,
 	}
 })

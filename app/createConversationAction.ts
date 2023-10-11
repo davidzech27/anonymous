@@ -2,12 +2,14 @@
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
+import { eq, and } from "drizzle-orm"
 
 import db from "~/database/db"
-import { conversation, message } from "~/database/schema"
+import { conversation, message, block } from "~/database/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
+import discord from "~/discord/discord"
 
 const createConversationAction = zact(
 	z.object({ userId: z.number(), content: z.string().min(1) })
@@ -31,6 +33,26 @@ const createConversationAction = zact(
 		},
 	})
 
+	const [blockRow] = await db
+		.select()
+		.from(block)
+		.where(
+			and(
+				eq(block.blockedUserId, auth.id),
+				eq(block.blockerUserId, userId)
+			)
+		)
+
+	if (blockRow !== undefined) throw new Error("You're blocked by this user")
+
+	const sendMessagePromise = discord.send(
+		`conversation created ${JSON.stringify(
+			{ from: auth.id, to: userId, content },
+			null,
+			4
+		)}`
+	)
+
 	const createdAt = new Date()
 
 	const [createdConversationRow] = await db
@@ -42,9 +64,7 @@ const createConversationAction = zact(
 	if (createdConversationRow === undefined)
 		throw new Error("Failed to create conversation")
 
-	if ((await moderateContentPromise).flagged)
-		content =
-			"this message did not obey our content policy. remember to be nice!"
+	const flagged = (await moderateContentPromise).flagged
 
 	const [createdMessageRow] = await db
 		.insert(message)
@@ -52,6 +72,7 @@ const createConversationAction = zact(
 			conversationId: createdConversationRow.id,
 			fromUserId: auth.id,
 			content,
+			flagged,
 			sentAt: createdAt,
 		})
 		.returning({ id: message.id })
@@ -66,15 +87,19 @@ const createConversationAction = zact(
 		firstMessage: {
 			id: createdMessageRow.id,
 			content,
+			flagged,
 		},
 		createdAt,
 	})
+
+	await sendMessagePromise
 
 	return {
 		id: createdConversationRow.id,
 		firstMessage: {
 			id: createdMessageRow.id,
 			content,
+			flagged,
 		},
 		createdAt,
 	}

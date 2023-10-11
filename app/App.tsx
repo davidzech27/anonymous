@@ -442,13 +442,13 @@ export default function App({
 							screen === "main" && "opacity-50"
 						)}
 					>
-					{/*			 @ts-expect-error - not worth figuring out */}
+						{/*			 @ts-expect-error - not worth figuring out */}
 						{conversation !== undefined
-							//@ts-expect-error - not worth figuring out
-							? "firstName" in conversation.user
+							? //@ts-expect-error - not worth figuring out
+							  "firstName" in conversation.user
 								? conversation.user.firstName
-							//	@ts-expect-error - not worth figuring out
-								: `#${conversation.user.id}`
+								: //	@ts-expect-error - not worth figuring out
+								  `#${conversation.user.id}`
 							: "users"}
 					</div>
 				</div>
@@ -478,7 +478,7 @@ export default function App({
 						}[screen]
 					)}
 				>
-					<div className="w-[25vw] space-y-3 overflow-y-auto overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
+					<div className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
 						{anonymousConversations.length !== 0 ? (
 							anonymousConversations.map((conversation) => (
 								<div
@@ -534,7 +534,7 @@ export default function App({
 						aria-live="polite"
 					>
 						{conversation === undefined ? (
-							<div className="space-y-3 overflow-y-auto p-3">
+							<div className="h-full space-y-3 overflow-y-auto p-3">
 								{users.map((user) => (
 									<div
 										key={user.id}

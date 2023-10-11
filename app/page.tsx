@@ -67,7 +67,7 @@ export default async function Index() {
 							const conversationIndex = prev.findIndex(
 								({ id }) => id === cur.conversation.id
 							)
-							console.log(cur.user.id)
+
 							if (conversationIndex === -1)
 								return prev.concat({
 									id: cur.conversation.id,

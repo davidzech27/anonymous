@@ -34,7 +34,7 @@ export default async function Index() {
 						createdAt: conversation.createdAt,
 					},
 					user: {
-						id: user.id,
+						id: conversation.anonymousUserId,
 					},
 					message: {
 						id: message.id,
@@ -46,7 +46,6 @@ export default async function Index() {
 				})
 				.from(conversation)
 				.where(eq(conversation.knownUserId, auth.id))
-				.innerJoin(user, eq(user.id, conversation.knownUserId))
 				.innerJoin(message, eq(conversation.id, message.conversationId))
 				.orderBy(desc(message.sentAt))
 				.then((rows) =>
@@ -68,7 +67,7 @@ export default async function Index() {
 							const conversationIndex = prev.findIndex(
 								({ id }) => id === cur.conversation.id
 							)
-
+							console.log(cur.user.id)
 							if (conversationIndex === -1)
 								return prev.concat({
 									id: cur.conversation.id,
@@ -142,7 +141,11 @@ export default async function Index() {
 						.reduce<
 							{
 								id: number
-								user: {id: number; firstName: string; lastName: string }
+								user: {
+									id: number
+									firstName: string
+									lastName: string
+								}
 								messages: {
 									id: number
 									me: boolean

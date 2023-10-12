@@ -498,7 +498,7 @@ export default function App({
 									)}
 								>
 									<div className="text-lg font-bold leading-none text-secondary">
-										#{conversation.user.id}
+										#{conversation.id}
 									</div>
 
 									<div className="pt-3" />

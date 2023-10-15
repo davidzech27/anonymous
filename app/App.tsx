@@ -4,6 +4,8 @@ import { z } from "zod"
 
 import createConversationAction from "./createConversationAction"
 import sendMessageAction from "./sendMessageAction"
+import blockUserAction from "./blockUserAction"
+import unblockUserAction from "./unblockUserAction"
 import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
 import Conversation from "./Conversation"
@@ -15,12 +17,14 @@ interface Props {
 		id: number
 		firstName: string
 		lastName: string
+		blocked: boolean
 		createdAt: Date
 	}[]
 	initialAnonymousConversations: {
 		id: number
 		user: {
 			id: number
+			blocked: boolean
 		}
 		messages: {
 			id: number
@@ -37,6 +41,7 @@ interface Props {
 			id: number
 			firstName: string
 			lastName: string
+			blocked: boolean
 		}
 		messages: {
 			id: number
@@ -97,14 +102,15 @@ export default function App({
 	const conversation =
 		conversationId !== undefined
 			? {
-					user: (
-						knownConversations.find(
+					user: knownConversations.find(
+						(conversation) => conversation.id === conversationId
+					)?.user ?? {
+						...(anonymousConversations.find(
 							(conversation) => conversation.id === conversationId
-						) ??
-						anonymousConversations.find(
-							(conversation) => conversation.id === conversationId
-						)
-					)?.user,
+						)?.user ?? { id: 0, blocked: false }),
+						firstName: undefined,
+						lastName: undefined,
+					},
 					messages:
 						knownConversations.find(
 							(conversation) => conversation.id === conversationId
@@ -117,7 +123,8 @@ export default function App({
 			: draftingUserId !== undefined
 			? {
 					user: users.find(({ id }) => id === draftingUserId) ?? {
-						id: draftingUserId,
+						id: 0,
+						blocked: false,
 					},
 					messages: [],
 			  }
@@ -225,8 +232,6 @@ export default function App({
 
 		const createdMessage = await sendMessageAction({
 			conversationId,
-			// @ts-expect-error - not worth figuring out
-			userId: conversation.user.id,
 			content: input,
 		})
 
@@ -312,6 +317,126 @@ export default function App({
 		})
 	}
 
+	const onBlock = async () => {
+		const userId = conversation?.user.id
+
+		if (userId === undefined) return
+
+		setUsers((users) => {
+			const userIndex = users.findIndex((user) => user.id === userId)
+
+			const user = users[userIndex]
+
+			if (user === undefined) return users
+
+			return [
+				...users.slice(0, userIndex),
+				{ ...user, blocked: true },
+				...users.slice(userIndex + 1),
+			]
+		})
+
+		setAnonymousConversations((conversations) => {
+			const conversationIndex = conversations.findIndex(
+				(conversation) => conversation.user.id === userId
+			)
+
+			const conversation = conversations[conversationIndex]
+
+			if (conversation === undefined) return conversations
+
+			return [
+				...conversations.slice(0, conversationIndex),
+				{
+					...conversation,
+					user: { ...conversation.user, blocked: true },
+				},
+				...conversations.slice(conversationIndex + 1),
+			]
+		})
+
+		setKnownConversations((conversations) => {
+			const conversationIndex = conversations.findIndex(
+				(conversation) => conversation.user.id === userId
+			)
+
+			const conversation = conversations[conversationIndex]
+
+			if (conversation === undefined) return conversations
+
+			return [
+				...conversations.slice(0, conversationIndex),
+				{
+					...conversation,
+					user: { ...conversation.user, blocked: true },
+				},
+				...conversations.slice(conversationIndex + 1),
+			]
+		})
+
+		await blockUserAction({ userId })
+	}
+
+	const onUnblock = async () => {
+		const userId = conversation?.user.id
+
+		if (userId === undefined) return
+
+		setUsers((users) => {
+			const userIndex = users.findIndex((user) => user.id === userId)
+
+			const user = users[userIndex]
+
+			if (user === undefined) return users
+
+			return [
+				...users.slice(0, userIndex),
+				{ ...user, blocked: false },
+				...users.slice(userIndex + 1),
+			]
+		})
+
+		setAnonymousConversations((conversations) => {
+			const conversationIndex = conversations.findIndex(
+				(conversation) => conversation.user.id === userId
+			)
+
+			const conversation = conversations[conversationIndex]
+
+			if (conversation === undefined) return conversations
+
+			return [
+				...conversations.slice(0, conversationIndex),
+				{
+					...conversation,
+					user: { ...conversation.user, blocked: false },
+				},
+				...conversations.slice(conversationIndex + 1),
+			]
+		})
+
+		setKnownConversations((conversations) => {
+			const conversationIndex = conversations.findIndex(
+				(conversation) => conversation.user.id === userId
+			)
+
+			const conversation = conversations[conversationIndex]
+
+			if (conversation === undefined) return conversations
+
+			return [
+				...conversations.slice(0, conversationIndex),
+				{
+					...conversation,
+					user: { ...conversation.user, blocked: false },
+				},
+				...conversations.slice(conversationIndex + 1),
+			]
+		})
+
+		await unblockUserAction({ userId })
+	}
+
 	useRealtime({
 		channel: "user",
 		event: "joined",
@@ -319,7 +444,7 @@ export default function App({
 			const user = userJoinedSchema.parse(message)
 
 			setUsers((prevUsers) => [
-				{ ...user, createdAt: new Date() },
+				{ ...user, blocked: false, createdAt: new Date() },
 				...prevUsers,
 			])
 		}, []),
@@ -334,7 +459,7 @@ export default function App({
 			setAnonymousConversations((prevAnonymousConversations) => [
 				{
 					id: conversation.id,
-					user: { id: conversation.anonymousUserId },
+					user: { id: conversation.anonymousUserId, blocked: false },
 					messages: [
 						{
 							id: conversation.firstMessage.id,
@@ -442,13 +567,10 @@ export default function App({
 							screen === "main" && "opacity-50"
 						)}
 					>
-						{/*			 @ts-expect-error - not worth figuring out */}
 						{conversation !== undefined
-							? //@ts-expect-error - not worth figuring out
-							  "firstName" in conversation.user
+							? "firstName" in conversation.user
 								? conversation.user.firstName
-								: //	@ts-expect-error - not worth figuring out
-								  `#${conversation.user.id}`
+								: `#${conversation.user.id}`
 							: "users"}
 					</div>
 				</div>
@@ -565,7 +687,6 @@ export default function App({
 							</div>
 						) : (
 							<Conversation
-								//	@ts-expect-error - not worth figuring out
 								user={conversation.user}
 								messages={conversation.messages}
 								onSend={
@@ -573,6 +694,8 @@ export default function App({
 										? onCreateConversation
 										: onSendMessage
 								}
+								onBlock={onBlock}
+								onUnblock={onUnblock}
 								onClose={
 									draftingUserId !== undefined
 										? () => setDraftingUserId(undefined)

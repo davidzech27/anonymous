@@ -4,10 +4,15 @@ import formatDuration from "~/util/formatDuration"
 interface Props {
 	user:
 		| {
+				id: number
 				firstName: string
 				lastName: string
+				blocked: boolean
 		  }
-		| { id: number }
+		| {
+				id: number
+				blocked: boolean
+		  }
 	messages: {
 		id: number
 		me: boolean
@@ -16,6 +21,8 @@ interface Props {
 		sentAt: Date
 	}[]
 	onSend: (input: string) => void
+	onBlock: () => void
+	onUnblock: () => void
 	onClose: () => void
 }
 
@@ -23,6 +30,8 @@ export default function Conversation({
 	user,
 	messages,
 	onSend,
+	onBlock,
+	onUnblock,
 	onClose,
 }: Props) {
 	const [input, setInput] = useState("")
@@ -56,7 +65,7 @@ export default function Conversation({
 
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
-			<div className="flex rounded-lg border border-white bg-white/20 p-3">
+			<div className="flex items-center rounded-lg border border-white bg-white/20 p-3">
 				<svg
 					onClick={onClose}
 					fill="none"
@@ -83,6 +92,26 @@ export default function Conversation({
 						? `${user.firstName} ${user.lastName}`
 						: `#${user.id}`}
 				</h1>
+
+				<div className="flex-1" />
+
+				{!user.blocked ? (
+					<div
+						onClick={onBlock}
+						role="button"
+						className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75"
+					>
+						block user
+					</div>
+				) : (
+					<div
+						onClick={onUnblock}
+						role="button"
+						className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75"
+					>
+						unblock user
+					</div>
+				)}
 			</div>
 
 			{messages !== undefined ? (

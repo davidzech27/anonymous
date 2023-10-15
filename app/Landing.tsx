@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 
@@ -8,6 +8,14 @@ import useRealtime from "~/realtime/useRealtime"
 
 interface Props {
 	initialUserCount: number
+	initialLastJoinedUserPromise: Promise<
+		| {
+				id: number
+				firstName: string
+				lastName: string
+		  }
+		| undefined
+	>
 }
 
 const userJoinedSchema = z.object({
@@ -16,7 +24,10 @@ const userJoinedSchema = z.object({
 	lastName: z.string(),
 })
 
-export default function Landing({ initialUserCount }: Props) {
+export default function Landing({
+	initialUserCount,
+	initialLastJoinedUserPromise,
+}: Props) {
 	const [firstNameInput, setFirstNameInput] = useState("")
 
 	const [lastNameInput, setLastNameInput] = useState("")
@@ -47,7 +58,11 @@ export default function Landing({ initialUserCount }: Props) {
 	const [userCount, setUserCount] = useState(initialUserCount)
 
 	const [lastJoinedUser, setLastJoinedUser] =
-		useState<z.infer<typeof userJoinedSchema>>()
+		useState<Awaited<typeof initialLastJoinedUserPromise>>()
+
+	useEffect(() => {
+		initialLastJoinedUserPromise.then(setLastJoinedUser)
+	}, [initialLastJoinedUserPromise])
 
 	useRealtime({
 		channel: "user",
@@ -116,14 +131,16 @@ export default function Landing({ initialUserCount }: Props) {
 
 			<div className="pt-8" />
 
-			{lastJoinedUser && (
+			{lastJoinedUser ? (
 				<div
-					className="text-lg font-bold text-secondary mobile:text-2xl"
+					className="text-2xl font-bold text-secondary"
 					aria-live="polite"
 				>
 					{lastJoinedUser.firstName} {lastJoinedUser.lastName} just
 					joined
 				</div>
+			) : (
+				<div className="h-8" />
 			)}
 		</main>
 	)

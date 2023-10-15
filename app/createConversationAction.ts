@@ -45,14 +45,6 @@ const createConversationAction = zact(
 
 	if (blockRow !== undefined) throw new Error("You're blocked by this user")
 
-	const sendMessagePromise = discord.send(
-		`conversation created ${JSON.stringify(
-			{ from: auth.id, to: userId, content },
-			null,
-			4
-		)}`
-	)
-
 	const createdAt = new Date()
 
 	const [createdConversationRow] = await db
@@ -65,6 +57,14 @@ const createConversationAction = zact(
 		throw new Error("Failed to create conversation")
 
 	const flagged = (await moderateContentPromise).flagged
+
+	const sendMessagePromise = discord.send(
+		`conversation created ${JSON.stringify(
+			{ from: auth.id, to: userId, content, flagged },
+			null,
+			4
+		)}`
+	)
 
 	const [createdMessageRow] = await db
 		.insert(message)

@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { desc, sql, eq } from "drizzle-orm"
 
 import db from "~/database/db"
-import { user, conversation, message } from "~/database/schema"
+import { user, conversation, message, block } from "~/database/schema"
 import { getAuth } from "~/auth/jwt"
 import Landing from "./Landing"
 import App from "./App"
@@ -10,17 +10,25 @@ import App from "./App"
 export default async function Index() {
 	const auth = await getAuth({ cookies })
 
-	if (auth === undefined)
+	if (auth === undefined) {
+		const userCount = await db
+			.select({ count: sql<number>`count(*)` })
+			.from(user)
+			.then(([row]) => row?.count ?? 0)
+
 		return (
 			<Landing
-				initialUserCount={await db
-					.select({ count: sql<number>`count(*)` })
+				initialUserCount={userCount}
+				initialLastJoinedUserPromise={db
+					.select()
 					.from(user)
-					.then(([row]) => row?.count ?? 0)}
+					.where(eq(user.id, userCount))
+					.then(([userRow]) => userRow ?? undefined)}
 			/>
 		)
+	}
 
-	const [users, anonymousConversations, initialKnownConversations] =
+	const [users, anonymousConversations, knownConversations, blocks] =
 		await Promise.all([
 			db
 				.select()
@@ -206,14 +214,48 @@ export default async function Index() {
 							messages: messages.reverse(),
 						}))
 				),
+			db
+				.select({ blockedUserId: block.blockedUserId })
+				.from(block)
+				.where(eq(block.blockerUserId, auth.id)),
 		])
 
 	return (
 		<App
 			userId={auth.id}
-			initialUsers={users}
-			initialAnonymousConversations={anonymousConversations}
-			initialKnownConversations={initialKnownConversations}
+			initialUsers={users.map((user) =>
+				blocks.find(
+					({ blockedUserId }) => blockedUserId === user.id
+				) !== undefined
+					? { ...user, blocked: true }
+					: { ...user, blocked: false }
+			)}
+			initialAnonymousConversations={anonymousConversations.map(
+				(conversation) => ({
+					...conversation,
+					user: {
+						...conversation.user,
+						blocked:
+							blocks.find(
+								({ blockedUserId }) =>
+									blockedUserId === conversation.user.id
+							) !== undefined,
+					},
+				})
+			)}
+			initialKnownConversations={knownConversations.map(
+				(conversation) => ({
+					...conversation,
+					user: {
+						...conversation.user,
+						blocked:
+							blocks.find(
+								({ blockedUserId }) =>
+									blockedUserId === conversation.user.id
+							) !== undefined,
+					},
+				})
+			)}
 		/>
 	)
 }

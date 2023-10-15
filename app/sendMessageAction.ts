@@ -14,10 +14,9 @@ import discord from "~/discord/discord"
 const sendMessageAction = zact(
 	z.object({
 		conversationId: z.number(),
-		userId: z.number(),
 		content: z.string().min(1),
 	})
-)(async ({ conversationId, userId, content }) => {
+)(async ({ conversationId, content }) => {
 	const auth = await getAuthOrThrow({ cookies })
 
 	const moderateContentPromise = moderateContent({
@@ -39,35 +38,15 @@ const sendMessageAction = zact(
 
 	const sentAt = new Date()
 
-	const [[conversationRow]] = await Promise.all([
-		db
-			.select({
-				anonymousUserId: conversation.anonymousUserId,
-				knownUserId: conversation.knownUserId,
-			})
-			.from(conversation)
-			.where(eq(conversation.id, conversationId)),
-		(async () => {
-			const [blockRow] = await db
-				.select()
-				.from(block)
-				.where(
-					and(
-						eq(block.blockedUserId, auth.id),
-						eq(block.blockerUserId, userId)
-					)
-				)
+	const [conversationRow] = await db
+		.select({
+			anonymousUserId: conversation.anonymousUserId,
+			knownUserId: conversation.knownUserId,
+		})
+		.from(conversation)
+		.where(eq(conversation.id, conversationId))
 
-			if (blockRow !== undefined)
-				throw new Error("You're blocked by this user")
-		})(),
-	])
-
-	if (
-		conversationRow === undefined ||
-		(conversationRow.anonymousUserId !== userId &&
-			conversationRow.knownUserId !== userId)
-	)
+	if (conversationRow === undefined)
 		throw new Error("Conversation does not exist")
 
 	if (
@@ -76,15 +55,32 @@ const sendMessageAction = zact(
 	)
 		throw new Error("Not in conversation")
 
+	const [blockRow] = await db
+		.select()
+		.from(block)
+		.where(
+			and(
+				eq(block.blockedUserId, auth.id),
+				eq(
+					block.blockerUserId,
+					conversationRow.anonymousUserId !== auth.id
+						? conversationRow.anonymousUserId
+						: conversationRow.knownUserId
+				)
+			)
+		)
+
+	if (blockRow !== undefined) throw new Error("You're blocked by this user")
+
+	const flagged = (await moderateContentPromise).flagged
+
 	const sendMessagePromise = discord.send(
 		`message sent ${JSON.stringify(
-			{ from: auth.id, conversationId, content },
+			{ from: auth.id, conversationId, content, flagged },
 			null,
 			4
 		)}`
 	)
-
-	const flagged = (await moderateContentPromise).flagged
 
 	const [createdMessageRow] = await db
 		.insert(message)

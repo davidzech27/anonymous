@@ -5,8 +5,8 @@ export default function formatDuration(start: Date) {
 
 	if (secondsAgo < 60) return `${Math.floor(secondsAgo)}s`
 	if (secondsAgo / 60 < 60) return `${Math.floor(secondsAgo / 60)}m`
-	if (secondsAgo / 60 ** 2 < 60) return `${Math.floor(secondsAgo / 60 ** 2)}h`
-	if (secondsAgo / (24 * 60 ** 2) < 60)
+	if (secondsAgo / 60 ** 2 < 24) return `${Math.floor(secondsAgo / 60 ** 2)}h`
+	if (secondsAgo / (24 * 60 ** 2) < 7)
 		return `${Math.floor(secondsAgo / (24 * 60 ** 2))}d`
 	return `${Math.floor(secondsAgo / (7 * 24 * 60 ** 2))}w`
 }

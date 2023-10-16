@@ -3,6 +3,8 @@ export async function POST(request: Request) {
 		(await request.text()).match(/(?<=&Body=).+(?=&)/g)?.[0] ?? ""
 	)
 
+	console.log({ body })
+
 	if (body === "STOP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -15,13 +17,13 @@ export async function POST(request: Request) {
     <Message><Body>This is where you'll receive notifications from us. Reply with STOP to opt-out.</Body></Message>
 </Response>
 `)
-
 	} else if (body === "HELP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Message><Body>This is where you'll receive notifications from us. Reply with STOP to opt-out.</Body></Message>
 </Response>
 `)
-
 	}
+
+	return new Response(null)
 }

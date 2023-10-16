@@ -326,55 +326,55 @@ async function handler(req: NextRequest) {
 						sentAt,
 					})
 				}
-			} else {
-				const [specialConversationMessages, [conversationRow]] =
-					await Promise.all([
-						db
-							.select()
-							.from(message)
-							.where(
-								eq(
-									message.conversationId,
-									specialConversationRow.id
-								)
-							),
-						db
-							.select()
-							.from(conversation)
-							.where(eq(conversation.id, conversationId)),
-					])
+			}
+		} else if (specialConversationRow !== undefined) {
+			const [specialConversationMessages, [conversationRow]] =
+				await Promise.all([
+					db
+						.select()
+						.from(message)
+						.where(
+							eq(
+								message.conversationId,
+								specialConversationRow.id
+							)
+						),
+					db
+						.select()
+						.from(conversation)
+						.where(eq(conversation.id, conversationId)),
+				])
 
-				if (
-					conversationRow?.knownUserId === fromUserId &&
-					specialConversationMessages.length <= 3
-				) {
-					const content = `hey, for every 5 people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler if everyone you knew were on it on it`
+			if (
+				conversationRow?.knownUserId === fromUserId &&
+				specialConversationMessages.length <= 3
+			) {
+				const content = `hey, for every 5 people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler if everyone you knew were on it on it`
 
-					const sentAt = new Date()
+				const sentAt = new Date()
 
-					const [createdMessageRow] = await db
-						.insert(message)
-						.values({
-							conversationId: specialConversationRow.id,
-							fromUserId: 1,
-							content,
-							flagged: false,
-							sentAt,
-						})
-						.returning({ id: message.id })
-						.all()
-
-					if (createdMessageRow === undefined)
-						throw new Error("Failed to create message")
-
-					await realtime.trigger(fromUserId.toString(), "message", {
-						id: createdMessageRow.id,
+				const [createdMessageRow] = await db
+					.insert(message)
+					.values({
 						conversationId: specialConversationRow.id,
+						fromUserId: 1,
 						content,
 						flagged: false,
 						sentAt,
 					})
-				}
+					.returning({ id: message.id })
+					.all()
+
+				if (createdMessageRow === undefined)
+					throw new Error("Failed to create message")
+
+				await realtime.trigger(fromUserId.toString(), "message", {
+					id: createdMessageRow.id,
+					conversationId: specialConversationRow.id,
+					content,
+					flagged: false,
+					sentAt,
+				})
 			}
 		}
 	}

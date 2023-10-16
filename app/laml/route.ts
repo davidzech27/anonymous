@@ -1,6 +1,10 @@
 export async function POST(request: Request) {
+	const text = await request.text()
+
+	const indexOfBody = text.indexOf("&Body=") + "&Body=".length
+
 	const body = decodeURIComponent(
-		(await request.text()).match(/(?<=&Body=).+(?=&)/g)?.[0] ?? ""
+		text.slice(indexOfBody, text.indexOf("&", indexOfBody))
 	)
 
 	console.log({ body })

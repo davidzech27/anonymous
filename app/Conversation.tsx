@@ -11,6 +11,8 @@ interface Props {
 		  }
 		| {
 				id: number
+				firstName: undefined
+				lastName: undefined
 				blocked: boolean
 		  }
 	messages: {
@@ -88,7 +90,7 @@ export default function Conversation({
 				<div className="pr-3" />
 
 				<h1 className="text-2xl font-bold leading-none text-white">
-					{"firstName" in user && "lastName" in user
+					{user.firstName !== undefined && user.lastName !== undefined
 						? `${user.firstName} ${user.lastName}`
 						: `#${user.id}`}
 				</h1>
@@ -128,7 +130,8 @@ export default function Conversation({
 							<div className="text-lg font-bold leading-none text-secondary">
 								{message.me
 									? "Me"
-									: "firstName" in user && "lastName" in user
+									: user.firstName !== undefined &&
+									  user.lastName !== undefined
 									? `${user.firstName} ${user.lastName}`
 									: `#${user.id}`}
 							</div>

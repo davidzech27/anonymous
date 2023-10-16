@@ -712,8 +712,8 @@ export default function App({
 									style={{
 										boxShadow:
 											conversation.unread !== 0
-												? "0 0 16px rgba(255, 255, 255, 0.5)"
-												: "0 0 16px rgba(255, 255, 255, 0)",
+												? "0 0 20px rgba(255, 255, 255, 0.5)"
+												: "0 0 20px rgba(255, 255, 255, 0)",
 									}}
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
@@ -729,7 +729,7 @@ export default function App({
 
 										{conversation.unread !== 0 && (
 											<div className="text-lg font-bold leading-none text-secondary">
-												{conversation.unread}
+												{conversation.unread} unread
 											</div>
 										)}
 									</div>
@@ -831,8 +831,8 @@ export default function App({
 									style={{
 										boxShadow:
 											conversation.unread !== 0
-												? "0 0 16px rgba(255, 255, 255, 0.5)"
-												: "0 0 16px rgba(255, 255, 255, 0)",
+												? "0 0 20px rgba(255, 255, 255, 0.5)"
+												: "0 0 20px rgba(255, 255, 255, 0)",
 									}}
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
@@ -849,7 +849,7 @@ export default function App({
 
 										{conversation.unread !== 0 && (
 											<div className="text-lg font-bold leading-none text-secondary">
-												{conversation.unread}
+												{conversation.unread} unread
 											</div>
 										)}
 									</div>

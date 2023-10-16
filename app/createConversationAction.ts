@@ -49,7 +49,13 @@ const createConversationAction = zact(
 
 	const [createdConversationRow] = await db
 		.insert(conversation)
-		.values({ anonymousUserId: auth.id, knownUserId: userId, createdAt })
+		.values({
+			anonymousUserId: auth.id,
+			knownUserId: userId,
+			anonymousUnread: 0,
+			knownUnread: 1,
+			createdAt,
+		})
 		.returning({ id: conversation.id })
 		.all()
 

@@ -44,6 +44,7 @@ export default async function Index() {
 					user: {
 						id: conversation.anonymousUserId,
 					},
+					unread: conversation.knownUnread,
 					message: {
 						id: message.id,
 						fromUserId: message.fromUserId,
@@ -62,6 +63,7 @@ export default async function Index() {
 							{
 								id: number
 								user: { id: number }
+								unread: number
 								messages: {
 									id: number
 									me: boolean
@@ -82,6 +84,7 @@ export default async function Index() {
 									user: {
 										id: cur.user.id,
 									},
+									unread: cur.unread,
 									messages: [
 										{
 											id: cur.message.id,
@@ -131,6 +134,7 @@ export default async function Index() {
 						firstName: user.firstName,
 						lastName: user.lastName,
 					},
+					unread: conversation.anonymousUnread,
 					message: {
 						id: message.id,
 						fromUserId: message.fromUserId,
@@ -154,6 +158,7 @@ export default async function Index() {
 									firstName: string
 									lastName: string
 								}
+								unread: number
 								messages: {
 									id: number
 									me: boolean
@@ -176,6 +181,7 @@ export default async function Index() {
 										firstName: cur.user.firstName,
 										lastName: cur.user.lastName,
 									},
+									unread: cur.unread,
 									messages: [
 										{
 											id: cur.message.id,

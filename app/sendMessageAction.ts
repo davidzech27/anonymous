@@ -2,7 +2,7 @@
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 
 import db from "~/database/db"
 import { conversation, message, block } from "~/database/schema"
@@ -82,17 +82,35 @@ const sendMessageAction = zact(
 		)}`
 	)
 
-	const [createdMessageRow] = await db
-		.insert(message)
-		.values({
-			conversationId,
-			fromUserId: auth.id,
-			content,
-			flagged,
-			sentAt,
-		})
-		.returning({ id: message.id })
-		.all()
+	const createdMessageRow = await db.transaction(async (tx) => {
+		try {
+			const [[createdMessageRow]] = await Promise.all([
+				tx
+					.insert(message)
+					.values({
+						conversationId,
+						fromUserId: auth.id,
+						content,
+						flagged,
+						sentAt,
+					})
+					.returning({ id: message.id })
+					.all(),
+				tx.update(conversation).set({
+					[conversationRow.anonymousUserId !== auth.id
+						? "anonymousUnread"
+						: "knownUnread"]:
+						conversationRow.anonymousUserId !== auth.id
+							? sql`anonymous_unread + 1`
+							: sql`known_unread + 1`,
+				}),
+			])
+
+			return createdMessageRow
+		} catch (e) {
+			tx.rollback()
+		}
+	})
 
 	if (createdMessageRow === undefined)
 		throw new Error("Failed to create message")

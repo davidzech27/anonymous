@@ -7,8 +7,6 @@ export async function POST(request: Request) {
 		text.slice(indexOfBody, text.indexOf("&", indexOfBody))
 	)
 
-	console.log({ body })
-
 	if (body === "STOP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>

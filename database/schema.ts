@@ -13,8 +13,8 @@ export const conversation = sqliteTable("conversation", {
 	id: integer("id").primaryKey(),
 	anonymousUserId: integer("anonymous_user_id").notNull(),
 	knownUserId: integer("known_user_id").notNull(),
-	// anonymousFirstName: text("anonymous_first_name"),
-	// anonymousLastName: text("anonymous_last_name"),
+	anonymousUnread: integer("anonymous_unread").notNull().default(0),
+	knownUnread: integer("known_unread").notNull().default(0),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 })
 

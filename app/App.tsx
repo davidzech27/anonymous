@@ -1,9 +1,10 @@
 "use client"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { z } from "zod"
 
 import createConversationAction from "./createConversationAction"
 import sendMessageAction from "./sendMessageAction"
+import readConversationAction from "./readConversationAction"
 import blockUserAction from "./blockUserAction"
 import unblockUserAction from "./unblockUserAction"
 import useRealtime from "~/realtime/useRealtime"
@@ -26,6 +27,7 @@ interface Props {
 			id: number
 			blocked: boolean
 		}
+		unread: number
 		messages: {
 			id: number
 			me: boolean
@@ -43,6 +45,7 @@ interface Props {
 			lastName: string
 			blocked: boolean
 		}
+		unread: number
 		messages: {
 			id: number
 			me: boolean
@@ -99,38 +102,120 @@ export default function App({
 
 	const [conversationId, setConversationId] = useState<number>()
 
-	const conversation =
-		conversationId !== undefined
-			? {
-					user: knownConversations.find(
-						(conversation) => conversation.id === conversationId
-					)?.user ?? {
-						...(anonymousConversations.find(
+	const conversationIdRef = useRef<number>()
+
+	const conversation = useMemo(
+		() =>
+			conversationId !== undefined
+				? {
+						user: knownConversations.find(
 							(conversation) => conversation.id === conversationId
-						)?.user ?? { id: 0, blocked: false }),
-						firstName: undefined,
-						lastName: undefined,
+						)?.user ?? {
+							...(anonymousConversations.find(
+								(conversation) =>
+									conversation.id === conversationId
+							)?.user ?? { id: 0, blocked: false }),
+							firstName: undefined,
+							lastName: undefined,
+						},
+						unread:
+							(
+								knownConversations.find(
+									(conversation) =>
+										conversation.id === conversationId
+								) ??
+								anonymousConversations.find(
+									(conversation) =>
+										conversation.id === conversationId
+								)
+							)?.unread ?? 0,
+						messages:
+							knownConversations.find(
+								(conversation) =>
+									conversation.id === conversationId
+							)?.messages ??
+							anonymousConversations.find(
+								(conversation) =>
+									conversation.id === conversationId
+							)?.messages ??
+							[],
+				  }
+				: draftingUserId !== undefined
+				? {
+						user: users.find(({ id }) => id === draftingUserId) ?? {
+							id: 0,
+							firstName: undefined,
+							lastName: undefined,
+							blocked: false,
+						},
+						unread: 0,
+						messages: [],
+				  }
+				: undefined,
+		[
+			conversationId,
+			anonymousConversations,
+			knownConversations,
+			draftingUserId,
+			users,
+		]
+	)
+
+	useEffect(() => {
+		conversationIdRef.current = conversationId
+
+		if (
+			conversationId !== undefined &&
+			conversation !== undefined &&
+			conversation.unread !== 0
+		) {
+			setAnonymousConversations((prevAnonymousConversations) => {
+				const conversationIndex = prevAnonymousConversations.findIndex(
+					({ id }) => id === conversationId
+				)
+
+				if (conversationIndex === -1) return prevAnonymousConversations
+
+				const conversation =
+					prevAnonymousConversations[conversationIndex]
+
+				if (conversation === undefined)
+					return prevAnonymousConversations
+
+				return [
+					...prevAnonymousConversations.slice(0, conversationIndex),
+					{
+						...conversation,
+						unread: 0,
 					},
-					messages:
-						knownConversations.find(
-							(conversation) => conversation.id === conversationId
-						)?.messages ??
-						anonymousConversations.find(
-							(conversation) => conversation.id === conversationId
-						)?.messages ??
-						[],
-			  }
-			: draftingUserId !== undefined
-			? {
-					user: users.find(({ id }) => id === draftingUserId) ?? {
-						id: 0,
-						firstName: undefined,
-						lastName: undefined,
-						blocked: false,
+					...prevAnonymousConversations.slice(conversationIndex + 1),
+				]
+			})
+
+			setKnownConversations((prevKnownConversations) => {
+				const conversationIndex = prevKnownConversations.findIndex(
+					({ id }) => id === conversationId
+				)
+
+				if (conversationIndex === -1) return prevKnownConversations
+
+				const conversation = prevKnownConversations[conversationIndex]
+
+				if (conversation === undefined) return prevKnownConversations
+
+				return [
+					...prevKnownConversations.slice(0, conversationIndex),
+					{
+						...conversation,
+						unread: 0,
 					},
-					messages: [],
-			  }
-			: undefined
+					...prevKnownConversations.slice(conversationIndex + 1),
+				]
+			})
+
+			readConversationAction({ conversationId })
+		}
+	}, [conversationId, conversation])
 
 	const onCreateConversation = async (input: string) => {
 		if (draftingUserId === undefined) return
@@ -152,6 +237,7 @@ export default function App({
 			{
 				id: newConversation.id,
 				user,
+				unread: 0,
 				messages: [
 					{
 						id: newConversation.firstMessage.id,
@@ -462,6 +548,7 @@ export default function App({
 				{
 					id: conversation.id,
 					user: { id: conversation.anonymousUserId, blocked: false },
+					unread: 1,
 					messages: [
 						{
 							id: conversation.firstMessage.id,
@@ -500,6 +587,10 @@ export default function App({
 				return [
 					{
 						...conversation,
+						unread:
+							conversationIdRef.current === conversation.id
+								? 0
+								: conversation.unread + 1,
 						messages: conversation.messages.concat({
 							id: message.id,
 							me: false,
@@ -527,6 +618,10 @@ export default function App({
 				return [
 					{
 						...conversation,
+						unread:
+							conversationIdRef.current === conversation.id
+								? 0
+								: conversation.unread + 1,
 						messages: conversation.messages.concat({
 							id: message.id,
 							me: false,
@@ -614,6 +709,12 @@ export default function App({
 									}}
 									role="button"
 									tabIndex={0}
+									style={{
+										boxShadow:
+											conversation.unread !== 0
+												? "0 0 16px rgba(255, 255, 255, 0.5)"
+												: "0 0 16px rgba(255, 255, 255, 0)",
+									}}
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
 										conversation.id === conversationId
@@ -621,8 +722,16 @@ export default function App({
 											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
 									)}
 								>
-									<div className="text-lg font-bold leading-none text-secondary">
-										#{conversation.id}
+									<div className="flex justify-between">
+										<div className="text-lg font-bold leading-none text-secondary">
+											#{conversation.id}
+										</div>
+
+										{conversation.unread !== 0 && (
+											<div className="text-lg font-bold leading-none text-secondary">
+												{conversation.unread}
+											</div>
+										)}
 									</div>
 
 									<div className="pt-3" />
@@ -719,6 +828,12 @@ export default function App({
 									}}
 									role="button"
 									tabIndex={0}
+									style={{
+										boxShadow:
+											conversation.unread !== 0
+												? "0 0 16px rgba(255, 255, 255, 0.5)"
+												: "0 0 16px rgba(255, 255, 255, 0)",
+									}}
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
 										conversation.id === conversationId
@@ -726,9 +841,17 @@ export default function App({
 											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
 									)}
 								>
-									<div className="text-lg font-bold leading-none text-secondary">
-										{conversation.user.firstName}{" "}
-										{conversation.user.lastName}
+									<div className="flex justify-between">
+										<div className="text-lg font-bold leading-none text-secondary">
+											{conversation.user.firstName}{" "}
+											{conversation.user.lastName}
+										</div>
+
+										{conversation.unread !== 0 && (
+											<div className="text-lg font-bold leading-none text-secondary">
+												{conversation.unread}
+											</div>
+										)}
 									</div>
 
 									<div className="pt-3" />

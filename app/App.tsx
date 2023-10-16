@@ -641,55 +641,11 @@ export default function App({
 
 	return (
 		<div className="flex h-screen flex-col bg-primary">
-			<nav className="hidden px-6 pt-1 mobile:flex">
-				<div className="flex-1 p-3 text-center">
-					<div
-						onClick={() => setScreen("anonymous")}
-						role="button"
-						className={cn(
-							"text-lg font-bold text-white transition",
-							screen === "anonymous" && "opacity-50"
-						)}
-					>
-						anonymous
-					</div>
-				</div>
-
-				<div className="flex-1 p-3 text-center">
-					<div
-						onClick={() => setScreen("main")}
-						role="button"
-						className={cn(
-							"text-lg font-bold text-white transition",
-							screen === "main" && "opacity-50"
-						)}
-					>
-						{conversation !== undefined
-							? conversation.user.firstName !== undefined
-								? conversation.user.firstName
-								: `#${conversation.user.id}`
-							: "users"}
-					</div>
-				</div>
-
-				<div className="flex-1 p-3 text-center">
-					<div
-						onClick={() => setScreen("known")}
-						role="button"
-						className={cn(
-							"text-lg font-bold text-white transition",
-							screen === "known" && "opacity-50"
-						)}
-					>
-						known
-					</div>
-				</div>
-			</nav>
 
 			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
 				<main
 					className={cn(
-						"relative flex h-[calc(100vh-70px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pt-0",
+						"relative flex h-[calc(100vh-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pb-0",
 						{
 							anonymous: "mobile:right-0",
 							main: "mobile:right-[100vw]",
@@ -890,6 +846,52 @@ export default function App({
 					</div>
 				</main>
 			</div>
+
+			<nav className="hidden px-6 py-3 mobile:flex">
+				<div className="flex-1 p-3 text-center">
+					<div
+						onClick={() => setScreen("anonymous")}
+						role="button"
+						className={cn(
+							"text-lg font-bold text-white transition",
+							screen === "anonymous" && "opacity-50"
+						)}
+					>
+						anonymous
+					</div>
+				</div>
+
+				<div className="flex-1 p-3 text-center">
+					<div
+						onClick={() => setScreen("main")}
+						role="button"
+						className={cn(
+							"text-lg font-bold text-white transition",
+							screen === "main" && "opacity-50"
+						)}
+					>
+						{conversation !== undefined
+							? conversation.user.firstName !== undefined
+								? conversation.user.firstName
+								: `#${conversation.user.id}`
+							: "users"}
+					</div>
+				</div>
+
+				<div className="flex-1 p-3 text-center">
+					<div
+						onClick={() => setScreen("known")}
+						role="button"
+						className={cn(
+							"text-lg font-bold text-white transition",
+							screen === "known" && "opacity-50"
+						)}
+					>
+						known
+					</div>
+				</div>
+			</nav>
+
 		</div>
 	)
 }

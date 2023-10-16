@@ -48,7 +48,7 @@ export default function Conversation({
 				scrollerRef.current.scrollHeight -
 				scrollerRef.current.clientHeight
 		}
-	}, [])
+	}, [user.id, user.firstName, user.lastName])
 
 	useEffect(() => {
 		if (

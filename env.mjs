@@ -10,6 +10,10 @@ const env = createEnv({
 		OPENAI_SECRET_KEY: z.string(),
 		SOKETI_APP_ID: z.string(),
 		SOKETI_APP_SECRET: z.string(),
+		SIGNALWIRE_PROJECT_ID: z.string(),
+		SIGNALWIRE_SPACE_URL: z.string(),
+		SIGNALWIRE_PHONE_NUMBER: z.string(),
+		SIGNALWIRE_API_TOKEN: z.string(),
 		DISCORD_WEBHOOK_URL: z.string().url(),
 	},
 	client: {
@@ -28,6 +32,10 @@ const env = createEnv({
 		SOKETI_APP_ID: process.env.SOKETI_APP_ID,
 		NEXT_PUBLIC_SOKETI_APP_KEY: process.env.NEXT_PUBLIC_SOKETI_APP_KEY,
 		SOKETI_APP_SECRET: process.env.SOKETI_APP_SECRET,
+		SIGNALWIRE_PROJECT_ID: process.env.SIGNALWIRE_PROJECT_ID,
+		SIGNALWIRE_SPACE_URL: process.env.SIGNALWIRE_SPACE_URL,
+		SIGNALWIRE_PHONE_NUMBER: process.env.SIGNALWIRE_PHONE_NUMBER,
+		SIGNALWIRE_API_TOKEN: process.env.SIGNALWIRE_API_TOKEN,
 		DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
 	},
 })

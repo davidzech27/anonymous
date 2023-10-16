@@ -154,11 +154,11 @@ async function handler(req: NextRequest) {
 			createdAt,
 		})
 
-		await new Promise((res) => setTimeout(res, 1000 * 10))
+		await new Promise((res) => setTimeout(res, 1000 * 7))
 
 		const secondCreatedAt = new Date()
 
-		const secondContent = `try picking someone from the user list to the right to send an anonymous message to--they'll (probably) never know it's you!`
+		const secondContent = `try picking someone from the user list to send an anonymous message to--they'll (probably) never know it's you!`
 
 		const [secondCreatedMessageRow] = await db
 			.insert(message)
@@ -183,7 +183,7 @@ async function handler(req: NextRequest) {
 			sentAt: secondCreatedAt,
 		})
 
-		await new Promise((res) => setTimeout(res, 1000 * 4))
+		await new Promise((res) => setTimeout(res, 1000 * 3))
 
 		const thirdCreatedAt = new Date()
 

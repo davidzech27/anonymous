@@ -124,6 +124,8 @@ export default function App({
 			? {
 					user: users.find(({ id }) => id === draftingUserId) ?? {
 						id: 0,
+						firstName: undefined,
+						lastName: undefined,
 						blocked: false,
 					},
 					messages: [],
@@ -568,7 +570,7 @@ export default function App({
 						)}
 					>
 						{conversation !== undefined
-							? "firstName" in conversation.user
+							? conversation.user.firstName !== undefined
 								? conversation.user.firstName
 								: `#${conversation.user.id}`
 							: "users"}

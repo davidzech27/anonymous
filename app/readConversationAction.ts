@@ -2,10 +2,10 @@
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
-import { and, eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 
 import db from "~/database/db"
-import { conversation, message, block } from "~/database/schema"
+import { conversation } from "~/database/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 const readConversationAction = zact(

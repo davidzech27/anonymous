@@ -720,8 +720,8 @@ export default function App({
 									style={{
 										boxShadow:
 											conversation.unread !== 0
-												? "0 0 20px rgba(255, 255, 255, 0.5)"
-												: "0 0 20px rgba(255, 255, 255, 0)",
+												? "0 0 16px rgba(255, 255, 255, 0.5)"
+												: "0 0 16px rgba(255, 255, 255, 0)",
 									}}
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",

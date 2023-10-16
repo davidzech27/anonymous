@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react"
 import formatDuration from "~/util/formatDuration"
 
 interface Props {
+	id: number | undefined
 	user:
 		| {
 				id: number
@@ -15,6 +16,7 @@ interface Props {
 				lastName: undefined
 				blocked: boolean
 		  }
+	special: boolean
 	messages: {
 		id: number
 		me: boolean
@@ -29,7 +31,9 @@ interface Props {
 }
 
 export default function Conversation({
+	id,
 	user,
+	special,
 	messages,
 	onSend,
 	onBlock,
@@ -67,53 +71,55 @@ export default function Conversation({
 
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
-			<div className="flex items-center rounded-lg border border-white bg-white/20 p-3">
-				<svg
-					onClick={onClose}
-					fill="none"
-					height="24"
-					shapeRendering="geometricPrecision"
-					stroke="currentColor"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					strokeWidth="2.5"
-					viewBox="0 0 24 24"
-					width="24"
-					aria-label="back to user list"
-					className="relative top-[1px] h-6 w-6 cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
-					tabIndex={0}
-				>
-					<path d="M18 6L6 18" />
-					<path d="M6 6l12 12" />
-				</svg>
-
-				<div className="pr-3" />
-
-				<h1 className="text-2xl font-bold leading-none text-white">
-					{user.firstName !== undefined && user.lastName !== undefined
-						? `${user.firstName} ${user.lastName}`
-						: `#${user.id}`}
-				</h1>
-
-				<div className="flex-1" />
-
-				{!user.blocked ? (
-					<div
-						onClick={onBlock}
-						role="button"
-						className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75"
+			<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:items-end mobile:space-y-3">
+				<div className="flex w-full mobile:justify-between">
+					<svg
+						onClick={onClose}
+						fill="none"
+						height="24"
+						shapeRendering="geometricPrecision"
+						stroke="currentColor"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth="2.5"
+						viewBox="0 0 24 24"
+						width="24"
+						aria-label="back to user list"
+						className="relative top-[1px] h-6 w-6 cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
+						tabIndex={0}
 					>
-						block user
-					</div>
-				) : (
-					<div
-						onClick={onUnblock}
-						role="button"
-						className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75"
-					>
-						unblock user
-					</div>
-				)}
+						<path d="M18 6L6 18" />
+						<path d="M6 6l12 12" />
+					</svg>
+
+					<div className="pr-3" />
+
+					<h1 className="text-2xl font-bold leading-none text-white">
+						{user.firstName !== undefined &&
+						user.lastName !== undefined
+							? `${user.firstName} ${user.lastName}`
+							: `#${id}`}
+					</h1>
+				</div>
+
+				{!special &&
+					(!user.blocked ? (
+						<div
+							onClick={onBlock}
+							role="button"
+							className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+						>
+							block user
+						</div>
+					) : (
+						<div
+							onClick={onUnblock}
+							role="button"
+							className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+						>
+							unblock user
+						</div>
+					))}
 			</div>
 
 			{messages !== undefined ? (
@@ -133,7 +139,7 @@ export default function Conversation({
 									: user.firstName !== undefined &&
 									  user.lastName !== undefined
 									? `${user.firstName} ${user.lastName}`
-									: `#${user.id}`}
+									: `#${id}`}
 							</div>
 
 							{!message.flagged ? (

@@ -9,6 +9,7 @@ import { conversation, message, block } from "~/database/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
+import triggerPotentialSpecialMessage from "./triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
 import discord from "~/discord/discord"
 
 const sendMessageAction = zact(
@@ -96,14 +97,17 @@ const sendMessageAction = zact(
 					})
 					.returning({ id: message.id })
 					.all(),
-				tx.update(conversation).set({
-					[conversationRow.anonymousUserId !== auth.id
-						? "anonymousUnread"
-						: "knownUnread"]:
-						conversationRow.anonymousUserId !== auth.id
-							? sql`anonymous_unread + 1`
-							: sql`known_unread + 1`,
-				}),
+				tx
+					.update(conversation)
+					.set({
+						[conversationRow.anonymousUserId !== auth.id
+							? "anonymousUnread"
+							: "knownUnread"]:
+							conversationRow.anonymousUserId !== auth.id
+								? sql`anonymous_unread + 1`
+								: sql`known_unread + 1`,
+					})
+					.where(eq(conversation.id, conversationId)),
 			])
 
 			return createdMessageRow
@@ -114,6 +118,14 @@ const sendMessageAction = zact(
 
 	if (createdMessageRow === undefined)
 		throw new Error("Failed to create message")
+
+	const triggerPotentialSpecialMessagePromise =
+		triggerPotentialSpecialMessage({
+			reason: "sentMessage",
+			fromUserId: auth.id,
+			conversationId,
+			content,
+		})
 
 	await realtime.trigger(
 		(conversationRow.anonymousUserId === auth.id
@@ -129,6 +141,8 @@ const sendMessageAction = zact(
 			sentAt,
 		}
 	)
+
+	await triggerPotentialSpecialMessagePromise
 
 	await sendMessagePromise
 

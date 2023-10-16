@@ -1,6 +1,6 @@
 "use client"
 import { useState, useCallback, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { z } from "zod"
 
 import createUserAction from "./createUserAction"
@@ -36,6 +36,8 @@ export default function Landing({
 
 	const [submitted, setSubmitted] = useState(false)
 
+	const [userId, setUserId] = useState<number | undefined>()
+
 	const disabled =
 		{ first: firstNameInput === "", last: lastNameInput === "" }[screen] ||
 		submitted
@@ -47,10 +49,15 @@ export default function Landing({
 
 		setSubmitted(true)
 
-		await createUserAction({
-			firstName: firstNameInput,
-			lastName: lastNameInput,
-		})
+		setUserId(
+			(
+				await createUserAction({
+					firstName: firstNameInput,
+					lastName: lastNameInput,
+					invitedByUserId,
+				})
+			).id
+		)
 
 		router.refresh()
 	}
@@ -61,20 +68,40 @@ export default function Landing({
 		useState<Awaited<typeof initialLastJoinedUserPromise>>()
 
 	useEffect(() => {
-		initialLastJoinedUserPromise.then(setLastJoinedUser)
+		setTimeout(
+			() => initialLastJoinedUserPromise.then(setLastJoinedUser),
+			1000
+		)
 	}, [initialLastJoinedUserPromise])
 
 	useRealtime({
 		channel: "user",
 		event: "joined",
-		onMessage: useCallback((message) => {
-			const user = userJoinedSchema.parse(message)
+		onMessage: useCallback(
+			(message) => {
+				const user = userJoinedSchema.parse(message)
 
-			setLastJoinedUser(user)
+				if (user.id === userId) return
 
-			setUserCount((prev) => prev + 1)
-		}, []),
+				setLastJoinedUser(user)
+
+				setUserCount((prev) => prev + 1)
+			},
+			[userId]
+		),
 	})
+
+	const [invitedByUserId, setInvitedByUserId] = useState<number>()
+
+	const searchParams = useSearchParams()
+
+	useEffect(() => {
+		if (!isNaN(Number(searchParams.get("invitedBy")))) {
+			setInvitedByUserId(Number(searchParams.get("invitedBy")))
+
+			router.replace("/")
+		}
+	}, [searchParams, router])
 
 	return (
 		<main className="flex h-screen flex-col items-center justify-center bg-primary p-6">

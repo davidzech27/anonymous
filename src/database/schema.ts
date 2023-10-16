@@ -4,8 +4,8 @@ export const user = sqliteTable("user", {
 	id: integer("id").primaryKey(),
 	firstName: text("first_name").notNull(),
 	lastName: text("last_name").notNull(),
-	// invitedUsers: integer("invited_users").default(0).notNull(),
-	// revealedUsers: integer("revealed_users").default(0).notNull(),
+	invitedUsers: integer("invited_users").notNull().default(0),
+	revealedUsers: integer("revealed_users").notNull().default(0),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 })
 
@@ -13,6 +13,7 @@ export const conversation = sqliteTable("conversation", {
 	id: integer("id").primaryKey(),
 	anonymousUserId: integer("anonymous_user_id").notNull(),
 	knownUserId: integer("known_user_id").notNull(),
+	special: integer("special", { mode: "boolean" }).notNull().default(false),
 	anonymousUnread: integer("anonymous_unread").notNull().default(0),
 	knownUnread: integer("known_unread").notNull().default(0),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),

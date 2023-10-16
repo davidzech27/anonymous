@@ -44,6 +44,7 @@ export default async function Index() {
 					user: {
 						id: conversation.anonymousUserId,
 					},
+					special: conversation.special,
 					unread: conversation.knownUnread,
 					message: {
 						id: message.id,
@@ -63,6 +64,7 @@ export default async function Index() {
 							{
 								id: number
 								user: { id: number }
+								special: boolean
 								unread: number
 								messages: {
 									id: number
@@ -84,6 +86,7 @@ export default async function Index() {
 									user: {
 										id: cur.user.id,
 									},
+									special: cur.special,
 									unread: cur.unread,
 									messages: [
 										{

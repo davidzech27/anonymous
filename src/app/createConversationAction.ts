@@ -90,6 +90,7 @@ const createConversationAction = zact(
 	await realtime.trigger(userId.toString(), "conversation", {
 		id: createdConversationRow.id,
 		anonymousUserId: auth.id,
+		special: false,
 		firstMessage: {
 			id: createdMessageRow.id,
 			content,

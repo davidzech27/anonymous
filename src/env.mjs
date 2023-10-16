@@ -3,11 +3,15 @@ import { createEnv } from "@t3-oss/env-nextjs"
 
 const env = createEnv({
 	server: {
+		URL: z.string().url(),
 		NODE_ENV: z.enum(["development", "test", "production"]),
 		DATABASE_URL: z.string().url(),
 		DATABASE_AUTH_TOKEN: z.string(),
 		JWT_SECRET: z.string(),
 		OPENAI_SECRET_KEY: z.string(),
+		QSTASH_TOKEN: z.string(),
+		QSTASH_CURRENT_SIGNING_KEY: z.string(),
+		QSTASH_NEXT_SIGNING_KEY: z.string(),
 		SOKETI_APP_ID: z.string(),
 		SOKETI_APP_SECRET: z.string(),
 		SIGNALWIRE_PROJECT_ID: z.string(),
@@ -20,13 +24,19 @@ const env = createEnv({
 		NEXT_PUBLIC_SOKETI_HOST: z.string(),
 		NEXT_PUBLIC_SOKETI_PORT: z.coerce.number(),
 		NEXT_PUBLIC_SOKETI_APP_KEY: z.string(),
+		NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+		NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
 	},
 	runtimeEnv: {
+		URL: process.env.URL,
 		NODE_ENV: process.env.NODE_ENV,
 		DATABASE_URL: process.env.DATABASE_URL,
 		DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
 		JWT_SECRET: process.env.JWT_SECRET,
 		OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
+		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+		QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+		QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_NEXT_SIGNING_KEY,
 		NEXT_PUBLIC_SOKETI_HOST: process.env.NEXT_PUBLIC_SOKETI_HOST,
 		NEXT_PUBLIC_SOKETI_PORT: process.env.NEXT_PUBLIC_SOKETI_PORT,
 		SOKETI_APP_ID: process.env.SOKETI_APP_ID,
@@ -37,6 +47,8 @@ const env = createEnv({
 		SIGNALWIRE_PHONE_NUMBER: process.env.SIGNALWIRE_PHONE_NUMBER,
 		SIGNALWIRE_API_TOKEN: process.env.SIGNALWIRE_API_TOKEN,
 		DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
+		NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+		NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
 	},
 })
 

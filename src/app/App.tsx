@@ -1,6 +1,7 @@
 "use client"
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { z } from "zod"
+import { posthog } from "posthog-js"
 
 import createConversationAction from "./createConversationAction"
 import sendMessageAction from "./sendMessageAction"
@@ -28,6 +29,7 @@ interface Props {
 			blocked: boolean
 		}
 		unread: number
+		special: boolean
 		messages: {
 			id: number
 			me: boolean
@@ -66,6 +68,7 @@ const userJoinedSchema = z.object({
 const conversationSchema = z.object({
 	id: z.number(),
 	anonymousUserId: z.number(),
+	special: z.boolean(),
 	firstMessage: z.object({
 		id: z.number(),
 		content: z.string(),
@@ -118,6 +121,11 @@ export default function App({
 							firstName: undefined,
 							lastName: undefined,
 						},
+						special:
+							anonymousConversations.find(
+								(conversation) =>
+									conversation.id === conversationId
+							)?.special ?? false,
 						unread:
 							(
 								knownConversations.find(
@@ -148,6 +156,7 @@ export default function App({
 							lastName: undefined,
 							blocked: false,
 						},
+						special: false,
 						unread: 0,
 						messages: [],
 				  }
@@ -160,6 +169,21 @@ export default function App({
 			users,
 		]
 	)
+
+	const anonymousUnread = anonymousConversations.reduce(
+		(prev, cur) => prev + cur.unread,
+		0
+	)
+
+	const knownUnread = knownConversations.reduce(
+		(prev, cur) => prev + cur.unread,
+		0
+	)
+
+	const conversationUnread =
+		[...anonymousConversations, ...anonymousConversations].find(
+			(conversation) => conversation.id === conversationId
+		)?.unread ?? 0
 
 	useEffect(() => {
 		conversationIdRef.current = conversationId
@@ -224,30 +248,35 @@ export default function App({
 
 		if (user === undefined) return
 
-		const newConversation = await createConversationAction({
+		const createdConversation = await createConversationAction({
 			userId: draftingUserId,
 			content: input,
 		})
 
+		posthog.capture("Create conversation", {
+			userId: draftingUserId,
+			...createdConversation,
+		})
+
 		setDraftingUserId(undefined)
 
-		setConversationId(newConversation.id)
+		setConversationId(createdConversation.id)
 
 		setKnownConversations((prevKnownConversations) => [
 			{
-				id: newConversation.id,
+				id: createdConversation.id,
 				user,
 				unread: 0,
 				messages: [
 					{
-						id: newConversation.firstMessage.id,
+						id: createdConversation.firstMessage.id,
 						me: true,
-						content: newConversation.firstMessage.content,
-						flagged: newConversation.firstMessage.flagged,
-						sentAt: newConversation.createdAt,
+						content: createdConversation.firstMessage.content,
+						flagged: createdConversation.firstMessage.flagged,
+						sentAt: createdConversation.createdAt,
 					},
 				],
-				createdAt: newConversation.createdAt,
+				createdAt: createdConversation.createdAt,
 			},
 			...prevKnownConversations,
 		])
@@ -321,6 +350,17 @@ export default function App({
 		const createdMessage = await sendMessageAction({
 			conversationId,
 			content: input,
+		})
+
+		posthog.capture("Send message", {
+			conversationId,
+			...createdMessage,
+			special:
+				conversationId ===
+				anonymousConversations.reduce(
+					(prev, cur) => (cur.id < prev ? cur.id : prev),
+					Infinity
+				),
 		})
 
 		setOptimisticMessages((prev) => prev - 1)
@@ -548,6 +588,7 @@ export default function App({
 				{
 					id: conversation.id,
 					user: { id: conversation.anonymousUserId, blocked: false },
+					special: conversation.special,
 					unread: 1,
 					messages: [
 						{
@@ -588,7 +629,8 @@ export default function App({
 					{
 						...conversation,
 						unread:
-							conversationIdRef.current === conversation.id
+							conversationIdRef.current === conversation.id &&
+							screenRef.current === "main"
 								? 0
 								: conversation.unread + 1,
 						messages: conversation.messages.concat({
@@ -619,7 +661,8 @@ export default function App({
 					{
 						...conversation,
 						unread:
-							conversationIdRef.current === conversation.id
+							conversationIdRef.current === conversation.id &&
+							screenRef.current === "main"
 								? 0
 								: conversation.unread + 1,
 						messages: conversation.messages.concat({
@@ -639,9 +682,18 @@ export default function App({
 
 	const [screen, setScreen] = useState<"anonymous" | "main" | "known">("main")
 
+	const [previousScreen, setPreviousScreen] = useState(screen)
+
+	const screenRef = useRef(screen)
+
+	useEffect(() => {
+		setPreviousScreen(screenRef.current)
+
+		screenRef.current = screen
+	}, [screen])
+
 	return (
 		<div className="flex h-screen flex-col bg-primary">
-
 			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
 				<main
 					className={cn(
@@ -695,7 +747,11 @@ export default function App({
 									<p className="font-light text-white">
 										{conversation.messages
 											.at(-1)
-											?.content.slice(0, 100)}
+											?.content.slice(0, 100) +
+											((conversation.messages.at(-1)
+												?.content.length ?? 0) >= 100
+												? "..."
+												: "")}
 									</p>
 
 									<div className="pt-3" />
@@ -746,7 +802,7 @@ export default function App({
 											</span>
 										</div>
 
-										<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100">
+										<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
 											send an anonymous message
 										</div>
 									</div>
@@ -754,6 +810,8 @@ export default function App({
 							</div>
 						) : (
 							<Conversation
+								id={conversationId}
+								special={conversation.special}
 								user={conversation.user}
 								messages={conversation.messages}
 								onSend={
@@ -766,7 +824,11 @@ export default function App({
 								onClose={
 									draftingUserId !== undefined
 										? () => setDraftingUserId(undefined)
-										: () => setConversationId(undefined)
+										: () => {
+												setConversationId(undefined)
+
+												setScreen(previousScreen)
+										  }
 								}
 							/>
 						)}
@@ -821,7 +883,11 @@ export default function App({
 
 										{conversation.messages
 											.at(-1)
-											?.content.slice(0, 100)}
+											?.content.slice(0, 100) +
+											((conversation.messages.at(-1)
+												?.content.length ?? 0) >= 100
+												? "..."
+												: "")}
 									</p>
 
 									<div className="pt-3" />
@@ -847,51 +913,66 @@ export default function App({
 				</main>
 			</div>
 
-			<nav className="hidden px-6 py-3 mobile:flex">
-				<div className="flex-1 p-3 text-center">
+			<nav className="hidden p-6 mobile:flex">
+				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => setScreen("anonymous")}
 						role="button"
 						className={cn(
-							"text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
 							screen === "anonymous" && "opacity-50"
 						)}
 					>
 						anonymous
+						{anonymousUnread !== 0 && (
+							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+								{anonymousUnread}
+							</div>
+						)}
 					</div>
 				</div>
 
-				<div className="flex-1 p-3 text-center">
+				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => setScreen("main")}
 						role="button"
 						className={cn(
-							"text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
 							screen === "main" && "opacity-50"
 						)}
 					>
 						{conversation !== undefined
 							? conversation.user.firstName !== undefined
 								? conversation.user.firstName
-								: `#${conversation.user.id}`
+								: `#${conversationId}`
 							: "users"}
+
+						{conversationUnread !== 0 && (
+							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+								{conversationUnread}
+							</div>
+						)}
 					</div>
 				</div>
 
-				<div className="flex-1 p-3 text-center">
+				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => setScreen("known")}
 						role="button"
 						className={cn(
-							"text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
 							screen === "known" && "opacity-50"
 						)}
 					>
 						known
+						{knownUnread !== 0 && (
+							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+								{knownUnread}
+							</div>
+						)}
 					</div>
 				</div>
 			</nav>
-
 		</div>
 	)
 }

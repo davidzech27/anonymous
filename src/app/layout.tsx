@@ -1,4 +1,7 @@
+import { Suspense } from "react"
+
 import "./globals.css"
+import { PostHogProvider, PostHogPageview } from "~/posthog/components"
 
 export const metadata = {
 	title: "mchsanonymous",
@@ -14,7 +17,13 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className="absolute inset-0">{children}</body>
+			<Suspense>
+				<PostHogPageview />
+			</Suspense>
+
+			<PostHogProvider>
+				<body className="absolute inset-0">{children}</body>
+			</PostHogProvider>
 		</html>
 	)
 }

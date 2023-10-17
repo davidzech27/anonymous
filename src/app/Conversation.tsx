@@ -107,7 +107,7 @@ export default function Conversation({
 						<div
 							onClick={onBlock}
 							role="button"
-							className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+							className="select-none whitespace-pre mobile:whitespace-pre-wrap text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
 						>
 							block user
 						</div>
@@ -115,7 +115,7 @@ export default function Conversation({
 						<div
 							onClick={onUnblock}
 							role="button"
-							className="select-none text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+							className="select-none whitespace-pre mobile:whitespace-pre-wrap text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
 						>
 							unblock user
 						</div>

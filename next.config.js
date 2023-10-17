@@ -1,4 +1,3 @@
-// @ts-expect-error - not sure what to do about this
 const os = require("os")
 
 /** @type {import('next').NextConfig} */

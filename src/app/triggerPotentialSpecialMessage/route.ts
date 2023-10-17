@@ -242,12 +242,13 @@ async function handler(req: NextRequest) {
 					.returning()
 					.all()
 
+
 				if (userRow !== undefined) {
+					userRow.revealedUsers--
+
 					const usersAllowedToReveal =
 						Math.floor(userRow.invitedUsers / 5) -
 						userRow.revealedUsers
-
-					console.log({usersAllowedToReveal})
 
 					const usersLeft =
 						5 - userRow.invitedUsers + 5 * userRow.revealedUsers

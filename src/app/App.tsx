@@ -692,6 +692,16 @@ export default function App({
 		screenRef.current = screen
 	}, [screen])
 
+	const [, rerender] = useState({})
+
+	useEffect(() => {
+		const intervalId = setInterval(rerender, 1000)
+
+		return () => {
+			clearInterval(intervalId)
+		}
+	}, [])
+
 	return (
 		<div className="flex h-screen flex-col bg-primary">
 			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">

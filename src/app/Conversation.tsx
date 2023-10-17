@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, Fragment } from "react"
 import formatDuration from "~/util/formatDuration"
 
 interface Props {
@@ -69,6 +69,25 @@ export default function Conversation({
 		}
 	}, [messages.length])
 
+	const [linkCopied, setLinkCopied] = useState(false)
+
+	const snapchatCreativeKitShareParentRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		const snapchatCreativeKitShare = document.getElementById(
+			"snapchat-creative-kit-share"
+		)
+
+		if (
+			snapchatCreativeKitShareParentRef.current &&
+			snapchatCreativeKitShare !== null
+		) {
+			snapchatCreativeKitShareParentRef.current.appendChild(
+				snapchatCreativeKitShare
+			)
+		}
+	}, [])
+
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
 			<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:items-end mobile:space-y-3">
@@ -107,7 +126,7 @@ export default function Conversation({
 						<div
 							onClick={onBlock}
 							role="button"
-							className="select-none whitespace-pre mobile:whitespace-pre-wrap text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+							className="select-none whitespace-pre text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:whitespace-pre-wrap mobile:text-base"
 						>
 							block user
 						</div>
@@ -115,7 +134,7 @@ export default function Conversation({
 						<div
 							onClick={onUnblock}
 							role="button"
-							className="select-none whitespace-pre mobile:whitespace-pre-wrap text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:text-base"
+							className="select-none whitespace-pre text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:whitespace-pre-wrap mobile:text-base"
 						>
 							unblock user
 						</div>
@@ -129,36 +148,77 @@ export default function Conversation({
 					aria-live="assertive"
 				>
 					{messages.map((message) => (
-						<div
-							key={message.id}
-							className="flex flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3"
-						>
-							<div className="text-lg font-bold leading-none text-secondary">
-								{message.me
-									? "Me"
-									: user.firstName !== undefined &&
-									  user.lastName !== undefined
-									? `${user.firstName} ${user.lastName}`
-									: `#${id}`}
-							</div>
+						<Fragment key={message.id}>
+							{" "}
+							<div className="flex flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3">
+								<div className="text-lg font-bold leading-none text-secondary">
+									{message.me
+										? "Me"
+										: user.firstName !== undefined &&
+										  user.lastName !== undefined
+										? `${user.firstName} ${user.lastName}`
+										: `#${id}`}
+								</div>
 
-							{!message.flagged ? (
-								<p className="break-words font-medium text-white">
-									{message.content}
-								</p>
-							) : (
-								<p className="break-words font-medium text-white">
-									this message did not comply with our content
-									policy. remember to be nice!
-								</p>
-							)}
+								{!message.flagged ? (
+									<p className="break-words font-medium text-white">
+										{message.content}
+									</p>
+								) : (
+									<p className="break-words font-medium text-white">
+										this message did not comply with our
+										content policy. remember to be nice!
+									</p>
+								)}
 
-							<div className="flex justify-end">
-								<span className="text-lg font-bold leading-none text-secondary">
-									{formatDuration(message.sentAt)}
-								</span>
+								<div className="flex justify-end">
+									<span className="text-lg font-bold leading-none text-secondary">
+										{formatDuration(message.sentAt)}
+									</span>
+								</div>
 							</div>
-						</div>
+							{special &&
+								message.content.includes("invitedBy") && (
+									<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:space-y-3">
+										<div
+											onClick={() => {
+												setLinkCopied(true)
+
+												navigator.clipboard.writeText(
+													message.content.match(
+														/(https:\/\/[^\s]+)/g
+													)?.[0] ?? ""
+												)
+											}}
+											role="button"
+											className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+										>
+											{!linkCopied
+												? "copy link"
+												: "link copied"}
+										</div>
+
+										<div
+											ref={
+												snapchatCreativeKitShareParentRef
+											}
+										/>
+
+										<a
+											href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
+												`I'm inviting you to mchsanonymous. Join here: ${
+													message.content.match(
+														/(https:\/\/[^\s]+)/g
+													)?.[0]
+												}`
+											)}`}
+											className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+										>
+											send email
+										</a>
+									</div>
+								)}
+						</Fragment>
 					))}
 				</div>
 			) : (

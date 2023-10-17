@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { desc, sql, eq } from "drizzle-orm"
 
+import env from "~/env.mjs"
 import db from "~/database/db"
 import { user, conversation, message, block } from "~/database/schema"
 import { getAuth } from "~/auth/jwt"
@@ -230,41 +231,51 @@ export default async function Index() {
 		])
 
 	return (
-		<App
-			userId={auth.id}
-			initialUsers={users.map((user) =>
-				blocks.find(
-					({ blockedUserId }) => blockedUserId === user.id
-				) !== undefined
-					? { ...user, blocked: true }
-					: { ...user, blocked: false }
-			)}
-			initialAnonymousConversations={anonymousConversations.map(
-				(conversation) => ({
-					...conversation,
-					user: {
-						...conversation.user,
-						blocked:
-							blocks.find(
-								({ blockedUserId }) =>
-									blockedUserId === conversation.user.id
-							) !== undefined,
-					},
-				})
-			)}
-			initialKnownConversations={knownConversations.map(
-				(conversation) => ({
-					...conversation,
-					user: {
-						...conversation.user,
-						blocked:
-							blocks.find(
-								({ blockedUserId }) =>
-									blockedUserId === conversation.user.id
-							) !== undefined,
-					},
-				})
-			)}
-		/>
+		<>
+			<div className="hidden">
+				<div
+					className="snapchat-creative-kit-share"
+					id="snapchat-creative-kit-share"
+					data-share-url={`${env.URL}/?invitedBy=${auth.id}`}
+				/>
+			</div>
+
+			<App
+				userId={auth.id}
+				initialUsers={users.map((user) =>
+					blocks.find(
+						({ blockedUserId }) => blockedUserId === user.id
+					) !== undefined
+						? { ...user, blocked: true }
+						: { ...user, blocked: false }
+				)}
+				initialAnonymousConversations={anonymousConversations.map(
+					(conversation) => ({
+						...conversation,
+						user: {
+							...conversation.user,
+							blocked:
+								blocks.find(
+									({ blockedUserId }) =>
+										blockedUserId === conversation.user.id
+								) !== undefined,
+						},
+					})
+				)}
+				initialKnownConversations={knownConversations.map(
+					(conversation) => ({
+						...conversation,
+						user: {
+							...conversation.user,
+							blocked:
+								blocks.find(
+									({ blockedUserId }) =>
+										blockedUserId === conversation.user.id
+								) !== undefined,
+						},
+					})
+				)}
+			/>
+		</>
 	)
 }

@@ -36,11 +36,11 @@ export default function Landing({
 
 	const [submitted, setSubmitted] = useState(false)
 
-const submittedRef = useRef(false)
+	const submittedRef = useRef(false)
 
-useEffect(() => {
-	submittedRef.current = submitted
-}, [submitted])
+	useEffect(() => {
+		submittedRef.current = submitted
+	}, [submitted])
 
 	const disabled =
 		{ first: firstNameInput === "", last: lastNameInput === "" }[screen] ||
@@ -77,18 +77,15 @@ useEffect(() => {
 	useRealtime({
 		channel: "user",
 		event: "joined",
-		onMessage: useCallback(
-			(message) => {
-				if (submittedRef.current) return
+		onMessage: useCallback((message) => {
+			if (submittedRef.current) return
 
-				const user = userJoinedSchema.parse(message)
+			const user = userJoinedSchema.parse(message)
 
-				setLastJoinedUser(user)
+			setLastJoinedUser(user)
 
-				setUserCount((prev) => prev + 1)
-			},
-			[]
-		),
+			setUserCount((prev) => prev + 1)
+		}, []),
 	})
 
 	const [invitedByUserId, setInvitedByUserId] = useState<number>()
@@ -96,8 +93,13 @@ useEffect(() => {
 	const searchParams = useSearchParams()
 
 	useEffect(() => {
-		if (!isNaN(Number(searchParams.get("invitedBy")))) {
-			setInvitedByUserId(Number(searchParams.get("invitedBy")))
+		const invitedByUserIdString = searchParams.get("invitedBy")
+
+		if (
+			invitedByUserIdString !== null &&
+			!isNaN(Number(invitedByUserIdString))
+		) {
+			setInvitedByUserId(Number(invitedByUserIdString))
 
 			router.replace("/")
 		}

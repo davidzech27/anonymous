@@ -24,6 +24,13 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" className="bg-primary">
+			<head>
+				<meta
+					property="snapchat:sticker"
+					content="https://mchsanonymous.vercel.app/opengraph-image.png"
+				/>
+			</head>
+
 			<Suspense>
 				<PostHogPageview />
 			</Suspense>

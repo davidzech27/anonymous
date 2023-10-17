@@ -4,7 +4,7 @@ import { z } from "zod"
 
 import env from "~/env.mjs"
 
-const authorizationCookieKey = "Authorization"
+const authorizationCookieKey = "Authorization2"
 
 const accessTokenPayloadSchema = z.object({
 	id: z.number(),

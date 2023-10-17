@@ -107,14 +107,8 @@ export default function Landing({
 
 	return (
 		<main className="flex h-full flex-col items-center justify-center bg-primary p-6">
-			<h1 className="absolute top-24 text-center text-5xl font-bold text-secondary">
+			<h1 className="absolute top-6 text-2xl font-bold text-secondary">
 				mchsanonymous
-				<br />
-				<div className="pt-4 text-xl">
-					send and receive
-
-					anonymous messages
-				</div>
 			</h1>
 
 			<h2 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">

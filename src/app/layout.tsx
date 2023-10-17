@@ -23,7 +23,7 @@ export default function RootLayout({
 			</Suspense>
 
 			<PostHogProvider>
-				<body className="absolute inset-0">{children}</body>
+				<body>{children}</body>
 			</PostHogProvider>
 
 			<Script id="snapkit-creative-kit-sdk-loader">

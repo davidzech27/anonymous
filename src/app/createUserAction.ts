@@ -49,8 +49,6 @@ const createUserAction = zact(
 	})
 
 	await triggerPotentialSpecialMessagePromise
-
-	return { id: createdUserRow.id }
 })
 
 export default createUserAction

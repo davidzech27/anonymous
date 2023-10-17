@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { z } from "zod"
 
@@ -36,7 +36,11 @@ export default function Landing({
 
 	const [submitted, setSubmitted] = useState(false)
 
-	const [userId, setUserId] = useState<number | undefined>()
+const submittedRef = useRef(false)
+
+useEffect(() => {
+	submittedRef.current = submitted
+}, [submitted])
 
 	const disabled =
 		{ first: firstNameInput === "", last: lastNameInput === "" }[screen] ||
@@ -49,15 +53,11 @@ export default function Landing({
 
 		setSubmitted(true)
 
-		setUserId(
-			(
-				await createUserAction({
-					firstName: firstNameInput,
-					lastName: lastNameInput,
-					invitedByUserId,
-				})
-			).id
-		)
+		await createUserAction({
+			firstName: firstNameInput,
+			lastName: lastNameInput,
+			invitedByUserId,
+		})
 
 		router.refresh()
 	}
@@ -79,15 +79,15 @@ export default function Landing({
 		event: "joined",
 		onMessage: useCallback(
 			(message) => {
-				const user = userJoinedSchema.parse(message)
+				if (submittedRef.current) return
 
-				if (user.id === userId) return
+				const user = userJoinedSchema.parse(message)
 
 				setLastJoinedUser(user)
 
 				setUserCount((prev) => prev + 1)
 			},
-			[userId]
+			[]
 		),
 	})
 

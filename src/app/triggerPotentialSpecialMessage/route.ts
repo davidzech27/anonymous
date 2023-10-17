@@ -247,6 +247,8 @@ async function handler(req: NextRequest) {
 						Math.floor(userRow.invitedUsers / 5) -
 						userRow.revealedUsers
 
+					console.log({usersAllowedToReveal})
+
 					const usersLeft =
 						5 - userRow.invitedUsers + 5 * userRow.revealedUsers
 
@@ -254,7 +256,7 @@ async function handler(req: NextRequest) {
 
 					let revealed = false
 
-					if (usersAllowedToReveal === 0) {
+					if (usersAllowedToReveal <= 0) {
 						content = `you still have to invite ${usersLeft} more users until you can reveal any${
 							userRow.revealedUsers > 0 ? " more" : ""
 						} identities. remember, here's your unique invite link: ${inviteLink}`
@@ -349,7 +351,7 @@ async function handler(req: NextRequest) {
 				conversationRow?.knownUserId === fromUserId &&
 				specialConversationMessages.length <= 3
 			) {
-				const content = `hey, for every 5 people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler if everyone you knew were on it on it`
+				const content = `hey, for every 5 people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
 
 				const sentAt = new Date()
 

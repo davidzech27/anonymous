@@ -106,10 +106,14 @@ export default function Landing({
 	}, [searchParams, router])
 
 	return (
-		<main className="flex h-screen flex-col items-center justify-center bg-primary p-6">
-			<h1 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">
-				send and receive anonymous messages from people at your school
+		<main className="flex h-full flex-col items-center justify-center bg-primary p-6">
+			<h1 className="absolute top-6 text-2xl font-bold leading-none text-secondary">
+				mchsanonymous
 			</h1>
+
+			<h2 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">
+				send and receive anonymous messages from people at your school
+			</h2>
 
 			<div className="pt-8" />
 

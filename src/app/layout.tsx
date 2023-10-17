@@ -3,11 +3,17 @@ import Script from "next/script"
 
 import "./globals.css"
 import { PostHogProvider, PostHogPageview } from "~/posthog/components"
+import Body from "./Body"
 
 export const metadata = {
 	title: "mchsanonymous",
 	description:
 		"send and receive anonymous messages from people at your school",
+	openGraph: {
+		title: "mchsanonymous",
+		description:
+			"send and receive anonymous messages from people at your school",
+	},
 	metadataBase: new URL("https://mchsanonymous.vercel.app"),
 }
 
@@ -17,13 +23,13 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<html lang="en">
+		<html lang="en" className="bg-primary">
 			<Suspense>
 				<PostHogPageview />
 			</Suspense>
 
 			<PostHogProvider>
-				<body>{children}</body>
+				<Body>{children}</Body>
 			</PostHogProvider>
 
 			<Script id="snapkit-creative-kit-sdk-loader">

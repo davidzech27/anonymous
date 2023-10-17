@@ -55,14 +55,7 @@ export default function Conversation({
 	}, [user.id, user.firstName, user.lastName])
 
 	useEffect(() => {
-		if (
-			scrollerRef.current !== null &&
-			Math.abs(
-				scrollerRef.current.scrollTop +
-					scrollerRef.current.clientHeight -
-					scrollerRef.current.scrollHeight
-			) < 300
-		) {
+		if (scrollerRef.current !== null) {
 			scrollerRef.current.scrollTop =
 				scrollerRef.current.scrollHeight -
 				scrollerRef.current.clientHeight
@@ -71,22 +64,43 @@ export default function Conversation({
 
 	const [linkCopied, setLinkCopied] = useState(false)
 
-	const snapchatCreativeKitShareParentRef = useRef<HTMLDivElement>(null)
+	const snapchatCreativeKitShareRef = useRef<{ element: HTMLElement | null }>(
+		{ element: null }
+	)
 
 	useEffect(() => {
 		const snapchatCreativeKitShare = document.getElementById(
 			"snapchat-creative-kit-share"
 		)
 
+		if (snapchatCreativeKitShare !== null)
+			snapchatCreativeKitShareRef.current.element =
+				snapchatCreativeKitShare
+	}, [])
+
+	const snapchatCreativeKitShareParentRef = useRef<HTMLDivElement>(null)
+
+	const [snapchatCreativeKitShareParent] = useState(() => (
+		<div ref={snapchatCreativeKitShareParentRef} className="h-7" />
+	))
+
+	useEffect(() => {
 		if (
 			snapchatCreativeKitShareParentRef.current &&
-			snapchatCreativeKitShare !== null
+			snapchatCreativeKitShareRef.current.element !== null
 		) {
 			snapchatCreativeKitShareParentRef.current.appendChild(
-				snapchatCreativeKitShare
+				snapchatCreativeKitShareRef.current.element
 			)
 		}
-	}, [])
+	}, [messages])
+
+	const lastInviteIndex =
+		messages.length -
+		1 -
+		[...messages]
+			.reverse()
+			.findIndex((message) => message.content.includes("invitedBy"))
 
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
@@ -147,9 +161,8 @@ export default function Conversation({
 					className="flex-1 space-y-3 overflow-y-auto"
 					aria-live="assertive"
 				>
-					{messages.map((message) => (
+					{messages.map((message, index) => (
 						<Fragment key={message.id}>
-							{" "}
 							<div className="flex flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3">
 								<div className="text-lg font-bold leading-none text-secondary">
 									{message.me
@@ -177,47 +190,43 @@ export default function Conversation({
 									</span>
 								</div>
 							</div>
-							{special &&
-								message.content.includes("invitedBy") && (
-									<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:space-y-3">
-										<div
-											onClick={() => {
-												setLinkCopied(true)
 
-												navigator.clipboard.writeText(
-													message.content.match(
-														/(https:\/\/[^\s]+)/g
-													)?.[0] ?? ""
-												)
-											}}
-											role="button"
-											className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
-										>
-											{!linkCopied
-												? "copy link"
-												: "link copied"}
-										</div>
+							{special && index === lastInviteIndex && (
+								<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3">
+									<div
+										onClick={() => {
+											setLinkCopied(true)
 
-										<div
-											ref={
-												snapchatCreativeKitShareParentRef
-											}
-										/>
-
-										<a
-											href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
-												`I'm inviting you to mchsanonymous. Join here: ${
-													message.content.match(
-														/(https:\/\/[^\s]+)/g
-													)?.[0]
-												}`
-											)}`}
-											className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
-										>
-											send email
-										</a>
+											navigator.clipboard.writeText(
+												message.content.match(
+													/(https:\/\/[^\s]+)/g
+												)?.[0] ?? ""
+											)
+										}}
+										role="button"
+										className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+									>
+										{!linkCopied
+											? "copy link"
+											: "link copied"}
 									</div>
-								)}
+
+									{snapchatCreativeKitShareParent}
+
+									<a
+										href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
+											`I'm inviting you to mchsanonymous. Join here: ${
+												message.content.match(
+													/(https:\/\/[^\s]+)/g
+												)?.[0]
+											}`
+										)}`}
+										className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+									>
+										send email
+									</a>
+								</div>
+							)}
 						</Fragment>
 					))}
 				</div>

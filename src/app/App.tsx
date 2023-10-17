@@ -695,7 +695,7 @@ export default function App({
 	const [, rerender] = useState({})
 
 	useEffect(() => {
-		const intervalId = setInterval(rerender, 1000)
+		const intervalId = setInterval(() => rerender({}), 1000)
 
 		return () => {
 			clearInterval(intervalId)
@@ -703,11 +703,11 @@ export default function App({
 	}, [])
 
 	return (
-		<div className="flex h-screen flex-col bg-primary">
+		<div className="flex h-full flex-col bg-primary">
 			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
 				<main
 					className={cn(
-						"relative flex h-[calc(100vh-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pb-0",
+						"relative flex h-[calc(100%-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pb-0",
 						{
 							anonymous: "mobile:right-0",
 							main: "mobile:right-[100vw]",
@@ -715,7 +715,10 @@ export default function App({
 						}[screen]
 					)}
 				>
-					<div className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
+					<div
+						aria-live="polite"
+						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]"
+					>
 						{anonymousConversations.length !== 0 ? (
 							anonymousConversations.map((conversation) => (
 								<div
@@ -844,7 +847,10 @@ export default function App({
 						)}
 					</div>
 
-					<div className=" w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]">
+					<div
+						aria-live="polite"
+						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]"
+					>
 						{knownConversations.length !== 0 ? (
 							knownConversations.map((conversation) => (
 								<div

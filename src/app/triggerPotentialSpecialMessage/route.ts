@@ -347,12 +347,12 @@ async function handler(req: NextRequest) {
 						.where(eq(conversation.id, conversationId)),
 				])
 
+			const content = `hey, for every 5 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
+
 			if (
 				conversationRow?.knownUserId === fromUserId &&
-				specialConversationMessages.length <= 3
+				specialConversationMessages.find((message) => message.content === content) === undefined
 			) {
-				const content = `hey, for every 5 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
-
 				const sentAt = new Date()
 
 				const [createdMessageRow] = await db

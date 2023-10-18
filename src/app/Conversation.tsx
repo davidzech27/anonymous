@@ -174,11 +174,11 @@ export default function Conversation({
 								</div>
 
 								{!message.flagged ? (
-									<p className="break-words font-medium text-white">
+									<p className="font-medium text-white">
 										{message.content}
 									</p>
 								) : (
-									<p className="break-words font-medium text-white">
+									<p className="font-medium text-white">
 										this message did not comply with our
 										content policy. remember to be nice!
 									</p>

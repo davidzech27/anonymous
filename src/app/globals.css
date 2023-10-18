@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+	* {
+		overflow-wrap: break-word;
+	}
+
 	*::selection {
 		@apply bg-secondary text-primary;
 		opacity: 1;

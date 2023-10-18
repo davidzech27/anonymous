@@ -232,7 +232,7 @@ async function handler(req: NextRequest) {
 			specialConversationRow !== undefined &&
 			conversationId === specialConversationRow.id
 		) {
-			const revealedConversationId = parseInt(content)
+			const revealedConversationId = Number(content.match(/\d+/g)?.[0])
 
 			if (!isNaN(revealedConversationId)) {
 				const [userRow] = await db

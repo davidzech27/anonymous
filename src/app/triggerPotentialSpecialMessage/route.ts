@@ -351,7 +351,9 @@ async function handler(req: NextRequest) {
 
 			if (
 				conversationRow?.knownUserId === fromUserId &&
-				specialConversationMessages.find((message) => message.content === content) === undefined
+				specialConversationMessages.find(
+					(message) => message.content === content
+				) === undefined
 			) {
 				const sentAt = new Date()
 
@@ -376,6 +378,35 @@ async function handler(req: NextRequest) {
 					content,
 					flagged: false,
 					sentAt,
+				})
+
+				await new Promise((res) => setTimeout(res, 1000 * 5))
+
+				const secondContent = "you should invite someone fr fr"
+
+				const secondSentAt = new Date()
+
+				const [secondCreatedMessageRow] = await db
+					.insert(message)
+					.values({
+						conversationId: specialConversationRow.id,
+						fromUserId: 1,
+						content: secondContent,
+						flagged: false,
+						sentAt: secondSentAt,
+					})
+					.returning({ id: message.id })
+					.all()
+
+				if (secondCreatedMessageRow === undefined)
+					throw new Error("Failed to create message")
+
+				await realtime.trigger(fromUserId.toString(), "message", {
+					id: secondCreatedMessageRow.id,
+					conversationId: specialConversationRow.id,
+					content: secondContent,
+					flagged: false,
+					sentAt: secondSentAt,
 				})
 			}
 		}

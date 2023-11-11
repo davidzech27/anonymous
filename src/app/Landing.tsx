@@ -1,5 +1,6 @@
 "use client"
 import { useState, useCallback, useEffect, useRef } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { z } from "zod"
 
@@ -125,35 +126,73 @@ export default function Landing({
 
 					if (screen === "last") onSubmit()
 				}}
-				className="flex space-x-2"
+				className="flex flex-col items-center space-y-6"
 			>
-				<input
-					type="text"
-					value={
-						{ first: firstNameInput, last: lastNameInput }[screen]
-					}
-					onChange={(e) =>
-						({ first: setFirstNameInput, last: setLastNameInput }[
-							screen
-						](e.target.value))
-					}
-					aria-required
-					aria-label={
-						{ first: "first name", last: "last name" }[screen]
-					}
-					placeholder={
-						{ first: "first name", last: "last name" }[screen]
-					}
-					className="rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:font-light placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/60"
-				/>
+				<div className="flex space-x-2">
+					<input
+						type="text"
+						value={
+							{ first: firstNameInput, last: lastNameInput }[
+								screen
+							]
+						}
+						onChange={(e) =>
+							({
+								first: setFirstNameInput,
+								last: setLastNameInput,
+							}[screen](e.target.value))
+						}
+						aria-required
+						aria-label={
+							{ first: "first name", last: "last name" }[screen]
+						}
+						placeholder={
+							{ first: "phone number", last: "name" }[screen]
+						}
+						className="rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:font-light placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/60"
+					/>
 
-				<button
-					type="submit"
-					disabled={disabled}
-					className="select-none rounded-lg border border-white bg-white/20 px-4 text-lg font-bold text-white transition hover:bg-white/30 focus-visible:bg-white/30 disabled:pointer-events-none disabled:opacity-50"
-				>
-					{{ first: "continue", last: "join" }[screen]}
-				</button>
+					<button
+						type="submit"
+						disabled={disabled}
+						className="select-none rounded-lg border border-white bg-white/20 px-4 text-lg font-bold text-white transition hover:bg-white/30 focus-visible:bg-white/30 disabled:pointer-events-none disabled:opacity-50"
+					>
+						{{ first: "continue", last: "join" }[screen]}
+					</button>
+				</div>
+
+				<div className="flex items-center space-x-2">
+					<p className="w-[30vw] text-sm text-white mobile:w-[70vw]">
+						Uncheck this box to opt out of unread message
+						notifications over SMS. Or, you can opt out later at any
+						time by replying STOP. Message Frequency may vary,
+						Msg&Data rates may apply.
+						<br />
+						<Link
+							href="https://understand.school/privacypolicy"
+							className="underline"
+						>
+							Privacy Policy
+						</Link>{" "}
+						<Link
+							href="https://understand.school"
+							className="underline"
+						>
+							More company information
+						</Link>
+					</p>
+
+					<label className="relative inline-block h-4 w-4">
+						<input
+							type="checkbox"
+							className="peer hidden h-4 w-4 cursor-pointer"
+						/>
+
+						<span className="absolute left-0 top-0 h-4 w-4 rounded-[4px] border border-secondary bg-primary" />
+
+						<span className="absolute left-1/2 top-[7px] h-[4.5px] w-[9.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 transform border-2 border-r-0 border-t-0 border-secondary opacity-0 transition-opacity peer-checked:opacity-100" />
+					</label>
+				</div>
 			</form>
 
 			<div className="pt-8" />
@@ -175,6 +214,22 @@ export default function Landing({
 			) : (
 				<div className="h-8" />
 			)}
+
+			<div className="absolute bottom-8 left-16 right-16 flex justify-between">
+				<Link
+					href="https://understand.school/privacypolicy"
+					className="font-bold text-secondary"
+				>
+					Privacy Policy
+				</Link>
+
+				<Link
+					href="https://understand.school"
+					className="font-bold text-secondary"
+				>
+					More company information
+				</Link>
+			</div>
 		</main>
 	)
 }

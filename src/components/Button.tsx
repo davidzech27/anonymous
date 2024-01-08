@@ -2,7 +2,8 @@ import cn from "~/util/cn"
 
 interface Props {
 	children: React.ReactNode
-	onClick: () => void
+	onClick?: () => void
+	type?: "submit" | "button" | "reset"
 	disabled?: boolean
 	"aria-label"?: string
 	className?: string
@@ -11,6 +12,7 @@ interface Props {
 export default function Button({
 	children,
 	onClick,
+	type,
 	disabled,
 	"aria-label": ariaLabel,
 	className,
@@ -18,6 +20,7 @@ export default function Button({
 	return (
 		<button
 			onClick={onClick}
+			type={type}
 			disabled={disabled}
 			aria-label={ariaLabel}
 			className={cn(

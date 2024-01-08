@@ -1,11 +1,12 @@
 "use server"
+
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
 import { eq } from "drizzle-orm"
 
-import db from "~/database/db"
-import { conversation } from "~/database/schema"
+import db from "~/db/db"
+import { conversation } from "~/db/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 
 const readConversationAction = zact(

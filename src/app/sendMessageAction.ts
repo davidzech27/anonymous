@@ -1,16 +1,16 @@
 "use server"
+
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
 import { and, eq, sql } from "drizzle-orm"
 
-import db from "~/database/db"
-import { conversation, message, block } from "~/database/schema"
+import db from "~/db/db"
+import { conversation, message, block } from "~/db/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
 import triggerPotentialSpecialMessage from "./triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
-import discord from "~/discord/discord"
 
 const sendMessageAction = zact(
 	z.object({
@@ -75,14 +75,6 @@ const sendMessageAction = zact(
 
 	const flagged = (await moderateContentPromise).flagged
 
-	const sendMessagePromise = discord.send(
-		`message sent ${JSON.stringify(
-			{ from: auth.id, conversationId, content, flagged },
-			null,
-			4
-		)}`
-	)
-
 	const createdMessageRow = await db.transaction(async (tx) => {
 		try {
 			const [[createdMessageRow]] = await Promise.all([
@@ -143,8 +135,6 @@ const sendMessageAction = zact(
 	)
 
 	await triggerPotentialSpecialMessagePromise
-
-	await sendMessagePromise
 
 	return {
 		id: createdMessageRow.id,

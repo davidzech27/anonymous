@@ -1,30 +1,63 @@
 import { cookies } from "next/headers"
 import { desc, sql, eq } from "drizzle-orm"
+import { unstable_noStore as noStore } from "next/cache"
 
 import env from "~/env.mjs"
-import db from "~/database/db"
-import { user, conversation, message, block } from "~/database/schema"
+import db from "~/db/db"
+import { user, conversation, message, block } from "~/db/schema"
 import { getAuth } from "~/auth/jwt"
 import Landing from "./Landing"
 import App from "./App"
 
-export default async function Index() {
+export const dynamic = "force-dynamic"
+
+export default async function Index({
+	searchParams,
+}: {
+	searchParams: Record<string, unknown>
+}) {
+	noStore()
+
 	const auth = await getAuth({ cookies })
 
 	if (auth === undefined) {
-		const userCount = await db
-			.select({ count: sql<number>`count(*)` })
-			.from(user)
-			.then(([row]) => row?.count ?? 0)
+		const invitedByUserIdString = searchParams.invitedBy
+
+		const invitedByUserId = isNaN(Number(invitedByUserIdString))
+			? undefined
+			: Number(invitedByUserIdString)
+
+		const [userCount, invitedByUser] = await Promise.all([
+			db
+				.select({ count: sql<number>`count(*)` })
+				.from(user)
+				.then(([row]) => row?.count ?? 0),
+			invitedByUserId !== undefined
+				? db
+						.select({
+							id: user.id,
+							firstName: user.firstName,
+							lastName: user.lastName,
+						})
+						.from(user)
+						.where(eq(user.id, invitedByUserId))
+						.then(([userRow]) => userRow)
+				: undefined,
+		])
 
 		return (
 			<Landing
 				initialUserCount={userCount}
 				initialLastJoinedUserPromise={db
-					.select()
+					.select({
+						id: user.id,
+						firstName: user.firstName,
+						lastName: user.lastName,
+					})
 					.from(user)
 					.where(eq(user.id, userCount))
-					.then(([userRow]) => userRow ?? undefined)}
+					.then(([userRow]) => userRow)}
+				invitedByUser={invitedByUser}
 			/>
 		)
 	}

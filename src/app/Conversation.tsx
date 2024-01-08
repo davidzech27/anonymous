@@ -194,10 +194,10 @@ export default function Conversation({
 							{special && index === lastInviteIndex && (
 								<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3">
 									<div
-										onClick={() => {
+										onClick={async () => {
 											setLinkCopied(true)
 
-											navigator.clipboard.writeText(
+											await navigator.clipboard.writeText(
 												message.content.match(
 													/(https:\/\/[^\s]+)/g
 												)?.[0] ?? ""

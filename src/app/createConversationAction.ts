@@ -1,15 +1,15 @@
 "use server"
+
 import { zact } from "zact/server"
 import { z } from "zod"
 import { cookies } from "next/headers"
 import { eq, and } from "drizzle-orm"
 
-import db from "~/database/db"
-import { conversation, message, block } from "~/database/schema"
+import db from "~/db/db"
+import { conversation, message, block } from "~/db/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
-import discord from "~/discord/discord"
 
 const createConversationAction = zact(
 	z.object({ userId: z.number(), content: z.string().min(1) })
@@ -64,14 +64,6 @@ const createConversationAction = zact(
 
 	const flagged = (await moderateContentPromise).flagged
 
-	const sendMessagePromise = discord.send(
-		`conversation created ${JSON.stringify(
-			{ from: auth.id, to: userId, content, flagged },
-			null,
-			4
-		)}`
-	)
-
 	const [createdMessageRow] = await db
 		.insert(message)
 		.values({
@@ -98,8 +90,6 @@ const createConversationAction = zact(
 		},
 		createdAt,
 	})
-
-	await sendMessagePromise
 
 	return {
 		id: createdConversationRow.id,

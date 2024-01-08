@@ -32,7 +32,7 @@ export default function useRealtime({
 		)
 
 		return () => {
-			channelPromise.then((channel) => channel.unsubscribe())
+			void channelPromise.then((channel) => channel.unsubscribe())
 		}
 	}, [channel, event, onMessage])
 }

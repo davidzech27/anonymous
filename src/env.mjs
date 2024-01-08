@@ -1,4 +1,4 @@
-import { z } from "zod"
+import z from "zod"
 import { createEnv } from "@t3-oss/env-nextjs"
 
 const env = createEnv({
@@ -7,6 +7,10 @@ const env = createEnv({
 		NODE_ENV: z.enum(["development", "test", "production"]),
 		DATABASE_URL: z.string().url(),
 		DATABASE_AUTH_TOKEN: z.string(),
+		KV_URL: z.string(),
+		KV_REST_API_URL: z.string(),
+		KV_REST_API_TOKEN: z.string(),
+		KV_REST_API_READ_ONLY_TOKEN: z.string(),
 		JWT_SECRET: z.string(),
 		OPENAI_SECRET_KEY: z.string(),
 		QSTASH_TOKEN: z.string(),
@@ -18,7 +22,6 @@ const env = createEnv({
 		SIGNALWIRE_SPACE_URL: z.string(),
 		SIGNALWIRE_PHONE_NUMBER: z.string(),
 		SIGNALWIRE_API_TOKEN: z.string(),
-		DISCORD_WEBHOOK_URL: z.string().url(),
 	},
 	client: {
 		NEXT_PUBLIC_SOKETI_HOST: z.string(),
@@ -32,6 +35,10 @@ const env = createEnv({
 		NODE_ENV: process.env.NODE_ENV,
 		DATABASE_URL: process.env.DATABASE_URL,
 		DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
+		KV_URL: process.env.KV_URL,
+		KV_REST_API_URL: process.env.KV_REST_API_URL,
+		KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
+		KV_REST_API_READ_ONLY_TOKEN: process.env.KV_REST_API_READ_ONLY_TOKEN,
 		JWT_SECRET: process.env.JWT_SECRET,
 		OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
 		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
@@ -46,7 +53,6 @@ const env = createEnv({
 		SIGNALWIRE_SPACE_URL: process.env.SIGNALWIRE_SPACE_URL,
 		SIGNALWIRE_PHONE_NUMBER: process.env.SIGNALWIRE_PHONE_NUMBER,
 		SIGNALWIRE_API_TOKEN: process.env.SIGNALWIRE_API_TOKEN,
-		DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
 		NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
 		NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
 	},

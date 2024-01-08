@@ -237,7 +237,7 @@ export default function App({
 				]
 			})
 
-			readConversationAction({ conversationId })
+			void readConversationAction({ conversationId })
 		}
 	}, [conversationId, conversation])
 
@@ -958,9 +958,8 @@ export default function App({
 						)}
 					>
 						{conversation !== undefined
-							? conversation.user.firstName !== undefined
-								? conversation.user.firstName
-								: `#${conversationId}`
+							? conversation.user.firstName ??
+							  `#${conversationId}`
 							: "users"}
 
 						{conversationUnread !== 0 && (

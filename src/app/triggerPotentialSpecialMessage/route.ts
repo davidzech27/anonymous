@@ -4,8 +4,8 @@ import { eq, sql, and } from "drizzle-orm"
 
 import env from "~/env.mjs"
 import { triggerPotentialSpecialMessageSchema } from "./triggerPotentialSpecialMessage"
-import db from "~/database/db"
-import { conversation, message, user } from "~/database/schema"
+import db from "~/db/db"
+import { conversation, message, user } from "~/db/schema"
 import realtime from "~/realtime/realtime"
 
 async function handler(req: NextRequest) {
@@ -125,7 +125,7 @@ async function handler(req: NextRequest) {
 		if (createdConversationRow === undefined)
 			throw new Error("Failed to create conversation")
 
-		const content = `welcome to mchsanonymous! send anyone you want anonymous messages--you can see who they are, but they won't be able to see who you are. remember not to cyberbully, or you will be banned. have fun!`
+		const content = `welcome to mchsanonymous! send anyone you want anonymous messages—you can see who they are, but they won't be able to see who you are. remember not to cyberbully, or you will be banned. have fun!`
 
 		const [createdMessageRow] = await db
 			.insert(message)

@@ -1,6 +1,6 @@
 import Pusher from "pusher"
 
-import env from "~/env.mjs"
+import env from "~/env.js"
 
 const realtime = new Pusher({
 	appId: env.SOKETI_APP_ID,

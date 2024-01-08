@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import posthog from "posthog-js"
 import { PostHogProvider as DefaultPostHogProvider } from "posthog-js/react"
 
-import env from "~/env.mjs"
+import env from "~/env.js"
 
 if (typeof window !== "undefined") {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {

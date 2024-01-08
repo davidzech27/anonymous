@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 
-import env from "~/env.mjs"
+import env from "~/env.js"
 
 export default function useRealtime({
 	channel,

@@ -2,7 +2,7 @@ import { type ResponseCookies } from "next/dist/compiled/@edge-runtime/cookies"
 import * as jose from "jose"
 import { z } from "zod"
 
-import env from "~/env.mjs"
+import env from "~/env.js"
 
 const authorizationCookieKey = "Authorization2"
 

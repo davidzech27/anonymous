@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { desc, sql, eq } from "drizzle-orm"
 import { unstable_noStore as noStore } from "next/cache"
 
-import env from "~/env.mjs"
+import env from "~/env.js"
 import db from "~/db/db"
 import { user, conversation, message, block } from "~/db/schema"
 import { getAuth } from "~/auth/jwt"

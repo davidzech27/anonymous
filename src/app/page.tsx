@@ -11,6 +11,8 @@ import App from "./App"
 
 export const dynamic = "force-dynamic"
 
+export const runtime = "edge"
+
 export default async function Index({
 	searchParams,
 }: {

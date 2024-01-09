@@ -65,6 +65,10 @@ export default function Landing({
 
 		input = input.trim().match(/\d/g)?.join("") ?? ""
 
+		if (input.length - phoneNumberInput.length > 1) {
+			input = `1${input}`
+		}
+
 		if (firstDiffIndex === 2) {
 			input = input.slice(1)
 		}

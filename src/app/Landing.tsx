@@ -287,12 +287,12 @@ export default function Landing({
 										)
 									}
 									id="opt-in-checkbox"
-									className="peer hidden h-4 w-4 cursor-pointer"
+									className="peer absolute inset-0 z-10 cursor-pointer opacity-0"
 								/>
 
-								<span className="absolute left-0 top-0 h-4 w-4 rounded-[4px] border border-secondary bg-primary" />
+								<span className="absolute left-0 top-0 h-4 w-4 rounded-[4px] border border-secondary bg-primary peer-focus-visible:ring" />
 
-								<span className="absolute left-[8px] top-[7px] h-[4.5px] w-[9.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 transform border-2 border-r-0 border-t-0 border-secondary opacity-0 transition-opacity peer-checked:opacity-100" />
+								<span className="absolute left-[8px] top-[7px] h-[4.5px] w-[9.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 transform border-2 border-r-0 border-t-0 border-secondary opacity-0 peer-checked:opacity-100" />
 							</div>
 						</div>
 

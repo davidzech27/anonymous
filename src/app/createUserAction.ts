@@ -81,6 +81,13 @@ const createUserAction = zact(
 			lastName: lastName.trim().slice(0, 50),
 			createdAt,
 		})
+		.onConflictDoUpdate({
+			target: user.phoneNumber,
+			set: {
+				firstName: firstName.trim().slice(0, 50),
+				lastName: lastName.trim().slice(0, 50),
+			},
+		})
 		.returning({ id: user.id })
 		.all()
 

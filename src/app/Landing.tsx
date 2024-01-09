@@ -173,7 +173,7 @@ export default function Landing({
 	})
 
 	return (
-		<main className="flex h-full flex-col items-center justify-between bg-primary p-6">
+		<main className="flex h-full flex-col items-center justify-between bg-primary p-6 mobile:p-5">
 			<h1 className="text-2xl font-bold text-secondary">mchsanonymous</h1>
 
 			<div className="flex flex-col items-center">
@@ -249,6 +249,7 @@ export default function Landing({
 								}[screen]
 							}
 							autoComplete="off"
+							className="flex-1"
 						/>
 
 						<Button type="submit" disabled={disabled}>

@@ -2,6 +2,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { z } from "zod"
 import { posthog } from "posthog-js"
+import Fuse from "fuse.js"
 
 import createConversationAction from "./createConversationAction"
 import sendMessageAction from "./sendMessageAction"
@@ -12,6 +13,7 @@ import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
 import Conversation from "./Conversation"
 import cn from "~/util/cn"
+import Input from "~/components/Input"
 
 interface Props {
 	userId: number
@@ -680,6 +682,24 @@ export default function App({
 		}, []),
 	})
 
+	const [searchUsersInput, setSearchUsersInput] = useState("")
+
+	const usersFuse = useMemo(
+		() =>
+			new Fuse(users, {
+				keys: [
+					{ name: "firstName", weight: 1 },
+					{ name: "lastName", weight: 0.5 },
+				],
+			}),
+		[users]
+	)
+
+	const displayedUsers =
+		searchUsersInput.trim() === ""
+			? users
+			: usersFuse.search(searchUsersInput).map((result) => result.item)
+
 	const [screen, setScreen] = useState<"anonymous" | "main" | "known">("main")
 
 	const [previousScreen, setPreviousScreen] = useState(screen)
@@ -787,64 +807,75 @@ export default function App({
 						)}
 					</div>
 
-					<div
-						className="relative w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]"
-						aria-live="polite"
-					>
-						{conversation === undefined ? (
-							<div className="h-full space-y-3 overflow-y-auto p-3">
-								{users.map((user) => (
-									<div
-										key={user.id}
-										onClick={() =>
-											setDraftingUserId(user.id)
-										}
-										role="button"
-										className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
-									>
-										<div className="text-lg font-bold leading-none text-secondary">
-											{user.firstName} {user.lastName}
+					<div className="h-[calc(100%-58px)] space-y-3">
+						<Input
+							value={searchUsersInput}
+							onChangeValue={setSearchUsersInput}
+							placeholder="search"
+							className="w-full"
+						/>
+
+						<div
+							className="relative h-full w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]"
+							aria-live="polite"
+						>
+							{conversation === undefined ? (
+								<div className="h-full space-y-3 overflow-y-auto p-3">
+									{displayedUsers.map((user) => (
+										<div
+											key={user.id}
+											onClick={() =>
+												setDraftingUserId(user.id)
+											}
+											role="button"
+											className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
+										>
+											<div className="text-lg font-bold leading-none text-secondary">
+												{user.firstName} {user.lastName}
+											</div>
+
+											<div className="pt-3" />
+
+											<div className="flex justify-end">
+												<span className="text-lg font-bold leading-none text-secondary">
+													Joined{" "}
+													{formatDuration(
+														user.createdAt
+													)}
+												</span>
+											</div>
+
+											<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
+												send an anonymous message
+											</div>
 										</div>
+									))}
+								</div>
+							) : (
+								<Conversation
+									id={conversationId}
+									special={conversation.special}
+									user={conversation.user}
+									messages={conversation.messages}
+									onSend={
+										draftingUserId !== undefined
+											? onCreateConversation
+											: onSendMessage
+									}
+									onBlock={onBlock}
+									onUnblock={onUnblock}
+									onClose={
+										draftingUserId !== undefined
+											? () => setDraftingUserId(undefined)
+											: () => {
+													setConversationId(undefined)
 
-										<div className="pt-3" />
-
-										<div className="flex justify-end">
-											<span className="text-lg font-bold leading-none text-secondary">
-												Joined{" "}
-												{formatDuration(user.createdAt)}
-											</span>
-										</div>
-
-										<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
-											send an anonymous message
-										</div>
-									</div>
-								))}
-							</div>
-						) : (
-							<Conversation
-								id={conversationId}
-								special={conversation.special}
-								user={conversation.user}
-								messages={conversation.messages}
-								onSend={
-									draftingUserId !== undefined
-										? onCreateConversation
-										: onSendMessage
-								}
-								onBlock={onBlock}
-								onUnblock={onUnblock}
-								onClose={
-									draftingUserId !== undefined
-										? () => setDraftingUserId(undefined)
-										: () => {
-												setConversationId(undefined)
-
-												setScreen(previousScreen)
-										  }
-								}
-							/>
-						)}
+													setScreen(previousScreen)
+											  }
+									}
+								/>
+							)}
+						</div>
 					</div>
 
 					<div

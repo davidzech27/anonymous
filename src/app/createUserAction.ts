@@ -105,21 +105,23 @@ const createUserAction = zact(
 
 	if (createdUserRow === undefined) throw new Error("Failed to create user")
 
-	const smsPromise =
-		createdUserRow.createdAt.getTime() === createdAt.getTime()
-			? sms.send({
-					to: phoneNumber,
-					content:
-						"You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
-			  })
-			: undefined
+	const isNewUser = createdUserRow.createdAt.getTime() === createdAt.getTime()
 
-	const triggerPotentialSpecialMessagePromise =
-		triggerPotentialSpecialMessage({
-			reason: "userJoined",
-			userId: createdUserRow.id,
-			invitedByUserId,
-		})
+	const smsPromise = isNewUser
+		? sms.send({
+				to: phoneNumber,
+				content:
+					"You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
+		  })
+		: undefined
+
+	const triggerPotentialSpecialMessagePromise = isNewUser
+		? triggerPotentialSpecialMessage({
+				reason: "userJoined",
+				userId: createdUserRow.id,
+				invitedByUserId,
+		  })
+		: undefined
 
 	await setAuth({
 		cookies,

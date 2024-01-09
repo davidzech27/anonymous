@@ -65,7 +65,12 @@ export default async function Index({
 	const [users, anonymousConversations, knownConversations, blocks] =
 		await Promise.all([
 			db
-				.select()
+				.select({
+					id: user.id,
+					firstName: user.firstName,
+					lastName: user.lastName,
+					createdAt: user.createdAt,
+				})
 				.from(user)
 				.orderBy(desc(user.createdAt))
 				.then((rows) => rows.filter(({ id }) => id !== auth.id)),

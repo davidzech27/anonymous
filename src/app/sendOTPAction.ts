@@ -38,7 +38,7 @@ const sendOTPAction = zact(
 	await Promise.all([
 		sms.send({
 			to: phoneNumber,
-			content: `Your mchsanonymous verification code is ${otp}. Reply STOP to unsubscribe.`,
+			content: `Your mchsanonymous verification code is ${otp}.`,
 		}),
 		kv.setex(OTP.key({ phoneNumber }), otpConstants.OTP_TTL_SECONDS, otp),
 		kv.setex(

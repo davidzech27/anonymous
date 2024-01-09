@@ -1,7 +1,7 @@
 import cn from "~/util/cn"
 
 interface Props {
-	type:
+	type?:
 		| "button"
 		| "checkbox"
 		| "color"
@@ -26,14 +26,14 @@ interface Props {
 		| "week"
 	value: string
 	onChangeValue: (value: string) => void
-	placeholder: string
+	placeholder?: string
 	"aria-required"?: boolean
 	"aria-label"?: string
 	autoComplete?: string
 	className?: string
 }
 
-export default function TextInput({
+export default function Input({
 	type,
 	value,
 	onChangeValue,

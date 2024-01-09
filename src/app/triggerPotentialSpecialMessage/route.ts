@@ -57,13 +57,13 @@ async function handler(req: NextRequest) {
 					return
 
 				const usersAllowedToReveal =
-					Math.floor(invitedByUserRow.invitedUsers / 5) -
+					Math.floor(invitedByUserRow.invitedUsers / 3) -
 					invitedByUserRow.revealedUsers
 
 				const usersLeft =
-					5 -
+					3 -
 					invitedByUserRow.invitedUsers +
-					5 * invitedByUserRow.revealedUsers
+					3 * invitedByUserRow.revealedUsers
 
 				const content = `${userRow.firstName} ${
 					userRow.lastName
@@ -238,27 +238,26 @@ async function handler(req: NextRequest) {
 
 			if (!isNaN(revealedConversationId)) {
 				const [userRow] = await db
-					.update(user)
-					.set({ revealedUsers: sql`revealed_users + 1` })
+					.select({
+						invitedUsers: user.invitedUsers,
+						revealedUsers: user.revealedUsers,
+					})
+					.from(user)
 					.where(eq(user.id, fromUserId))
-					.returning()
-					.all()
 
 				if (userRow !== undefined) {
-					userRow.revealedUsers--
-
 					const usersAllowedToReveal =
-						Math.floor(userRow.invitedUsers / 5) -
+						Math.floor(userRow.invitedUsers / 3) -
 						userRow.revealedUsers
-
-					const usersLeft =
-						5 - userRow.invitedUsers + 5 * userRow.revealedUsers
 
 					let content: string
 
 					let revealed = false
 
 					if (usersAllowedToReveal <= 0) {
+						const usersLeft =
+							3 * userRow.revealedUsers - userRow.invitedUsers + 3
+
 						content = `you still have to invite ${usersLeft} more users until you can reveal any${
 							userRow.revealedUsers > 0 ? " more" : ""
 						} identities. remember, here's your unique invite link: ${inviteLink}`
@@ -299,11 +298,14 @@ async function handler(req: NextRequest) {
 						}
 					}
 
-					if (revealed === false)
+					if (revealed) {
 						await db
 							.update(user)
-							.set({ revealedUsers: sql`revealed_users - 1` })
+							.set({
+								revealedUsers: sql`revealed_users + 1`,
+							})
 							.where(eq(user.id, fromUserId))
+					}
 
 					const sentAt = new Date()
 
@@ -349,7 +351,7 @@ async function handler(req: NextRequest) {
 						.where(eq(conversation.id, conversationId)),
 				])
 
-			const content = `hey, for every 5 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
+			const content = `hey, for every 3 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
 
 			if (
 				conversationRow?.knownUserId === fromUserId &&

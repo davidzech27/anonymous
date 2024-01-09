@@ -18,6 +18,7 @@ import {
 	verificationCoolingDown,
 } from "~/kv/schema"
 import otpConstants from "./otpConstants"
+import sms from "~/sms/sms"
 
 const createUserAction = zact(
 	z.object({
@@ -88,10 +89,19 @@ const createUserAction = zact(
 				lastName: lastName.trim().slice(0, 50),
 			},
 		})
-		.returning({ id: user.id })
+		.returning({ id: user.id, createdAt: user.createdAt })
 		.all()
 
 	if (createdUserRow === undefined) throw new Error("Failed to create user")
+
+	const smsPromise =
+		createdUserRow.createdAt.getTime() === createdAt.getTime()
+			? sms.send({
+					to: phoneNumber,
+					content:
+						"You've subscribed to notifications from mchsanonymous. Notifications are sent at most once per day for unread mchsanonymous messages, if any. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
+			  })
+			: undefined
 
 	const triggerPotentialSpecialMessagePromise =
 		triggerPotentialSpecialMessage({
@@ -110,6 +120,8 @@ const createUserAction = zact(
 		firstName,
 		lastName,
 	})
+
+	await smsPromise
 
 	await expireAttemptsPromise
 	await deleteKeysPromise

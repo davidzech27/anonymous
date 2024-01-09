@@ -294,10 +294,10 @@ export default function Landing({
 						</div>
 
 						<p className="text-[10px] text-white/70">
-							notifications are sent recurrently for unread
-							messages. or, you can opt out later at any time by
-							replying STOP. message frequency may vary, Msg&Data
-							rates may apply.
+							notifications are sent at most once per day for
+							unread mchsanonymous messages, if any. or, you can
+							opt out later at any time by replying STOP. message
+							frequency may vary, Msg&Data rates may apply.
 						</p>
 					</div>
 				</form>

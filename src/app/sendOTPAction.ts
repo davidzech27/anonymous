@@ -43,8 +43,10 @@ const sendOTPAction = zact(
 		kv.setex(OTP.key({ phoneNumber }), otpConstants.OTP_TTL_SECONDS, otp),
 		kv.setex(
 			resendCoolingDown.key({ phoneNumber }),
-			otpConstants.RESEND_COOLDOWN_SECONDS -
-				(new Date().getTime() - start.getTime()) / 1000,
+			Math.round(
+				otpConstants.RESEND_COOLDOWN_SECONDS -
+					(new Date().getTime() - start.getTime()) / 1000
+			),
 			1
 		),
 	])

@@ -820,8 +820,8 @@ export default function App({
 							<Input
 								value={searchUsersInput}
 								onChangeValue={setSearchUsersInput}
-								placeholder="search"
-								className="w-full"
+								placeholder="search mchs students on mchsanonymous"
+								className="w-full text-base"
 							/>
 						)}
 
@@ -836,35 +836,43 @@ export default function App({
 						>
 							{conversation === undefined ? (
 								<div className="h-full space-y-3 overflow-y-auto p-3">
-									{displayedUsers.map((user) => (
-										<div
-											key={user.id}
-											onClick={() =>
-												setDraftingUserId(user.id)
-											}
-											role="button"
-											className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
-										>
-											<div className="text-lg font-bold leading-none text-secondary">
-												{user.firstName} {user.lastName}
-											</div>
+									{displayedUsers.length === 0 ? (
+										<span className="text-lg font-medium text-white">
+											you need to get {searchUsersInput}{" "}
+											on mchsanonymous!!
+										</span>
+									) : (
+										displayedUsers.map((user) => (
+											<div
+												key={user.id}
+												onClick={() =>
+													setDraftingUserId(user.id)
+												}
+												role="button"
+												className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
+											>
+												<div className="text-lg font-bold leading-none text-secondary">
+													{user.firstName}{" "}
+													{user.lastName}
+												</div>
 
-											<div className="pt-3" />
+												<div className="pt-3" />
 
-											<div className="flex justify-end">
-												<span className="text-lg font-bold leading-none text-secondary">
-													Joined{" "}
-													{formatDuration(
-														user.createdAt
-													)}
-												</span>
-											</div>
+												<div className="flex justify-end">
+													<span className="text-lg font-bold leading-none text-secondary">
+														Joined{" "}
+														{formatDuration(
+															user.createdAt
+														)}
+													</span>
+												</div>
 
-											<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
-												send an anonymous message
+												<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
+													send an anonymous message
+												</div>
 											</div>
-										</div>
-									))}
+										))
+									)}
 								</div>
 							) : (
 								<Conversation

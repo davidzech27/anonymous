@@ -120,39 +120,32 @@ const createUserAction = zact(
 		const isNewUser =
 			createdUserRow.createdAt.getTime() === createdAt.getTime()
 
-		const smsPromise = isNewUser
-			? sms.send({
+		await Promise.all([
+			await setAuth({
+				cookies,
+				auth: { id: createdUserRow.id, firstName, lastName },
+			}),
+			isNewUser &&
+				sms.send({
 					to: phoneNumber,
 					content:
 						"You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
-			  })
-			: undefined
-
-		const triggerPotentialSpecialMessagePromise = isNewUser
-			? triggerPotentialSpecialMessage({
+				}),
+			isNewUser &&
+				triggerPotentialSpecialMessage({
 					reason: "userJoined",
 					userId: createdUserRow.id,
 					invitedByUserId,
-			  })
-			: undefined
-
-		await setAuth({
-			cookies,
-			auth: { id: createdUserRow.id, firstName, lastName },
-		})
-
-		await realtime.trigger("user", "joined", {
-			id: createdUserRow.id,
-			firstName,
-			lastName,
-		})
-
-		await smsPromise
-
-		await expireAttemptsPromise
-		await deleteKeysPromise
-
-		await triggerPotentialSpecialMessagePromise
+				}),
+			isNewUser &&
+				realtime.trigger("user", "joined", {
+					id: createdUserRow.id,
+					firstName,
+					lastName,
+				}),
+			expireAttemptsPromise,
+			deleteKeysPromise,
+		])
 	}
 )
 

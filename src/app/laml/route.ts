@@ -9,11 +9,10 @@ export async function POST(request: Request) {
 	const indexOfBody = text.indexOf("&Body=") + "&Body=".length
 
 	const phoneNumber = Number(text.match(/\d{7}(?=&To=)/)?.[0])
-
 	const body = decodeURIComponent(
 		text.slice(indexOfBody, text.indexOf("&", indexOfBody))
 	)
-
+	console.log({ phoneNumber, body })
 	if (body === "STOP") {
 		await db
 			.update(user)

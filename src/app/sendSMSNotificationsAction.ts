@@ -7,13 +7,14 @@ export default async function sendSMSNotificationsAction(
 	users: {
 		phoneNumber: number
 		unread: number
+		smsNotificationConsent: boolean
 	}[]
 ) {
 	"use server"
 
 	await Promise.all(
 		users
-			.filter((user) => user.unread > 0)
+			.filter((user) => user.unread > 0 && user.smsNotificationConsent)
 			.map(
 				(user) =>
 					new Promise((res) =>

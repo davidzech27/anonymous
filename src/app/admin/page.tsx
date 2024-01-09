@@ -24,6 +24,7 @@ export default async function Admin() {
 					phoneNumber: user.phoneNumber,
 					firstName: user.firstName,
 					lastName: user.lastName,
+					smsNotificationConsent: user.smsNotificationConsent,
 				})
 				.from(user),
 			db
@@ -61,6 +62,7 @@ export default async function Admin() {
 		phoneNumber: user.phoneNumber,
 		firstName: user.firstName,
 		lastName: user.lastName,
+		smsNotificationConsent: user.smsNotificationConsent,
 		unread:
 			(userIdToAnonymousUnreadMessagesMap.get(user.id) ?? 0) +
 			(userIdToKnownUnreadMessagesMap.get(user.id) ?? 0),

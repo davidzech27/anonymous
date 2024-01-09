@@ -103,14 +103,12 @@ export default function Landing({
 		}[screen] || submitting
 
 	const onSendOTP = async () => {
-		try {
-			await sendOTPAction({
-				phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
-			})
-		} catch (e) {
-			if (e instanceof Error) {
-				alert(e.message)
-			}
+		const response = await sendOTPAction({
+			phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
+		})
+
+		if (response?.status === "error") {
+			alert(response.status)
 		}
 	}
 
@@ -119,22 +117,18 @@ export default function Landing({
 
 		setSubmitting(true)
 
-		try {
-			await createUserAction({
-				firstName: firstNameInput,
-				lastName: lastNameInput,
-				phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
-				otp: Number(otpInput.match(/\d/g)?.join("")),
-				invitedByUserId: invitedByUser?.id,
-			})
+		const response = await createUserAction({
+			firstName: firstNameInput,
+			lastName: lastNameInput,
+			phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
+			otp: otpInput.trim(),
+			invitedByUserId: invitedByUser?.id,
+		})
 
+		if (response?.status === "error") {
+			alert(response.status)
+		} else {
 			location.reload()
-		} catch (e) {
-			if (e instanceof Error) {
-				alert(e.message)
-			}
-
-			setSubmitting(false)
 		}
 	}
 

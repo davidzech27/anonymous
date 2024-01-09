@@ -25,7 +25,7 @@ const createUserAction = zact(
 		firstName: z.string().min(1),
 		lastName: z.string().min(1),
 		phoneNumber: z.number(),
-		otp: z.number(),
+		otp: z.string(),
 		invitedByUserId: z.number().optional(),
 	})
 )(async ({ firstName, lastName, phoneNumber, otp, invitedByUserId }) => {
@@ -33,23 +33,34 @@ const createUserAction = zact(
 
 	const createdAt = new Date()
 
-	const storedOTP = await kv.get(OTP.key({ phoneNumber }))
+	const storedOTP = OTP.validator.parse(
+		await kv.get(OTP.key({ phoneNumber }))
+	)
 
-	if (typeof storedOTP !== "number") {
-		throw new Error("Verification code expired.")
+	if (storedOTP === null) {
+		return {
+			status: "error" as const,
+			message: "Verification code expired.",
+		}
 	}
 
 	const verificationCoolDown = Boolean(
-		await kv.get(verificationCoolingDown.key({ phoneNumber }))
+		verificationCoolingDown.validator.parse(
+			await kv.get(verificationCoolingDown.key({ phoneNumber }))
+		)
 	)
 
 	if (verificationCoolDown) {
-		throw new Error("Slow down. Please wait before entering another code.")
+		return {
+			status: "error" as const,
+			message: "Slow down. Please wait before entering another code.",
+		}
 	}
 
 	if (
-		(await kv.incr(verificationAttempts.key({ phoneNumber }))) >=
-		otpConstants.OTP_VERIFICATIONS_BEFORE_COOLDOWNS
+		(verificationAttempts.validator.parse(
+			await kv.incr(verificationAttempts.key({ phoneNumber }))
+		) ?? 0) >= otpConstants.OTP_VERIFICATIONS_BEFORE_COOLDOWNS
 	) {
 		await kv.setex(
 			verificationCoolingDown.key({ phoneNumber }),
@@ -64,12 +75,14 @@ const createUserAction = zact(
 	)
 
 	if (storedOTP !== otp) {
-		throw new Error("Incorrect verification code.")
+		return {
+			status: "error" as const,
+			message: "Incorrect verification code.",
+		}
 	}
 
 	const deleteKeysPromise = kv.del(
 		OTP.key({ phoneNumber }),
-		resendCoolingDown.key({ phoneNumber }),
 		verificationAttempts.key({ phoneNumber }),
 		verificationCoolingDown.key({ phoneNumber })
 	)
@@ -89,7 +102,10 @@ const createUserAction = zact(
 				lastName: lastName.trim().slice(0, 50),
 			},
 		})
-		.returning({ id: user.id, createdAt: user.createdAt })
+		.returning({
+			id: user.id,
+			createdAt: user.createdAt,
+		})
 		.all()
 
 	if (createdUserRow === undefined) throw new Error("Failed to create user")

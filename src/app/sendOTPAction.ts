@@ -16,39 +16,35 @@ const sendOTPAction = zact(
 )(async ({ phoneNumber }) => {
 	noStore()
 
-	const start = new Date().getSeconds()
+	const start = new Date()
 
 	const resendCoolDown = Boolean(
-		await kv.get(resendCoolingDown.key({ phoneNumber }))
+		resendCoolingDown.validator.parse(
+			await kv.get(resendCoolingDown.key({ phoneNumber }))
+		)
 	)
 
-	const secondsElapsed = new Date().getSeconds() - start
-
 	if (resendCoolDown) {
-		throw new Error(
-			"Slow down. Please wait before requesting another code."
-		)
+		return {
+			status: "error" as const,
+			message: "Slow down. Please wait before requesting another code.",
+		}
 	}
 
-	const OTPString = Math.floor(Math.random() * 1000000)
+	const otp = Math.floor(Math.random() * 1000000)
 		.toString()
 		.padStart(6, "0")
 
 	await Promise.all([
 		sms.send({
 			to: phoneNumber,
-			content: `Your mchsanonymous verification code is ${OTPString}. Reply STOP to unsubscribe.`,
+			content: `Your mchsanonymous verification code is ${otp}. Reply STOP to unsubscribe.`,
 		}),
-		kv.setex(
-			OTP.key({ phoneNumber }),
-			otpConstants.OTP_TTL_SECONDS,
-			OTPString
-		),
+		kv.setex(OTP.key({ phoneNumber }), otpConstants.OTP_TTL_SECONDS, otp),
 		kv.setex(
 			resendCoolingDown.key({ phoneNumber }),
 			otpConstants.RESEND_COOLDOWN_SECONDS -
-				secondsElapsed -
-				otpConstants.RESEND_COOLDOWN_NETWORK_GRACE_TIME,
+				(new Date().getTime() - start.getTime()) / 1000,
 			1
 		),
 	])

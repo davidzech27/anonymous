@@ -36,6 +36,7 @@ const createUserAction = zact(
 		noStore()
 
 		const createdAt = new Date()
+		createdAt.setMilliseconds(0)
 
 		const storedOTP = OTP.validator.parse(
 			await kv.get(OTP.key({ phoneNumber }))

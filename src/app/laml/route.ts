@@ -43,9 +43,9 @@ export async function POST(request: Request) {
 
 	if (body === "HELP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
-        <Response>
-            <Message><Body>This is where you'll receive notifications from mchsanonymous. Reach out to support@understand.school for further assistance. Reply with STOP to opt-out.</Body></Message>
-        </Response>`)
+<Response>
+    <Message><Body>This is where you'll receive notifications from mchsanonymous. Reach out to support@understand.school for further assistance. Reply with STOP to opt-out.</Body></Message>
+</Response>`)
 	}
 
 	return new Response(null)

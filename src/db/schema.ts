@@ -5,6 +5,11 @@ export const user = sqliteTable("user", {
 	phoneNumber: integer("phone_number").notNull().unique(),
 	firstName: text("first_name").notNull(),
 	lastName: text("last_name").notNull(),
+	smsNotificationConsent: integer("sms_notification_consent", {
+		mode: "boolean",
+	})
+		.notNull()
+		.default(true),
 	invitedUsers: integer("invited_users").notNull().default(0),
 	revealedUsers: integer("revealed_users").notNull().default(0),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),

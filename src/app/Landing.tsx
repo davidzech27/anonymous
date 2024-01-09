@@ -45,6 +45,9 @@ export default function Landing({
 
 	const [lastNameInput, setLastNameInput] = useState("")
 
+	const [smsNotificationConsentInput, setSmsNotificationConsentInput] =
+		useState(true)
+
 	const [phoneNumberInput, setPhoneNumberInput] = useState("+1 ")
 
 	const onChangePhoneNumberInput = (input: string) => {
@@ -122,6 +125,7 @@ export default function Landing({
 			lastName: lastNameInput,
 			phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
 			otp: otpInput.trim(),
+			smsNotificationConsent: smsNotificationConsentInput,
 			invitedByUserId: invitedByUser?.id,
 		})
 
@@ -276,7 +280,12 @@ export default function Landing({
 							<div className="relative inline-block h-4 w-4">
 								<input
 									type="checkbox"
-									defaultChecked
+									checked={smsNotificationConsentInput}
+									onChange={(e) =>
+										setSmsNotificationConsentInput(
+											e.target.checked
+										)
+									}
 									id="opt-in-checkbox"
 									className="peer hidden h-4 w-4 cursor-pointer"
 								/>

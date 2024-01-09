@@ -9,6 +9,27 @@ import env from "~/env.mjs"
 if (typeof window !== "undefined") {
 	posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 		api_host: env.NEXT_PUBLIC_POSTHOG_HOST,
+		session_recording: {
+			maskAllInputs: false,
+			maskInputOptions: {
+				password: true,
+				color: false,
+				date: false,
+				"datetime-local": false,
+				email: false,
+				month: false,
+				number: false,
+				range: false,
+				search: false,
+				tel: false,
+				text: false,
+				time: false,
+				url: false,
+				week: false,
+				textarea: false,
+				select: false,
+			},
+		},
 	})
 }
 

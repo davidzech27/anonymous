@@ -14,7 +14,7 @@ const changeTypingStatusAction = zact(
 )(async ({ typingStatus }) => {
 	const auth = await getAuthOrThrow({ cookies })
 
-	await realtime.trigger(`user-${auth.id}`, "typing", typingStatus)
+	await realtime.trigger(`typing-${auth.id}`, "typing", typingStatus)
 })
 
 export default changeTypingStatusAction

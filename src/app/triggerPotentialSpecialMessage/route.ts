@@ -156,7 +156,7 @@ async function handler(req: NextRequest) {
 			createdAt,
 		})
 
-		await new Promise((res) => setTimeout(res, 1000 * 7))
+		await new Promise((res) => setTimeout(res, 1000 * 5))
 
 		const secondCreatedAt = new Date()
 

@@ -996,7 +996,7 @@ export default function App({
 					>
 						anonymous
 						{anonymousUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{anonymousUnread}
 							</div>
 						)}
@@ -1018,7 +1018,7 @@ export default function App({
 							: "users"}
 
 						{conversationUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{conversationUnread}
 							</div>
 						)}
@@ -1036,7 +1036,7 @@ export default function App({
 					>
 						known
 						{knownUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{knownUnread}
 							</div>
 						)}

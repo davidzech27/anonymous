@@ -155,7 +155,7 @@ export default function Conversation({
 	}
 
 	useRealtime({
-		channel: `user-${user.id}`,
+		channel: `typing-${user.id}`,
 		event: `typing`,
 		onMessage: (message) => {
 			if (typeof message === "boolean") {

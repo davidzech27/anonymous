@@ -808,12 +808,14 @@ export default function App({
 					</div>
 
 					<div className="h-[calc(100%-58px)] space-y-3">
-						<Input
-							value={searchUsersInput}
-							onChangeValue={setSearchUsersInput}
-							placeholder="search"
-							className="w-full"
-						/>
+						{conversation === undefined && (
+							<Input
+								value={searchUsersInput}
+								onChangeValue={setSearchUsersInput}
+								placeholder="search"
+								className="w-full"
+							/>
+						)}
 
 						<div
 							className="relative h-full w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]"

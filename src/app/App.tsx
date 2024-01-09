@@ -785,7 +785,7 @@ export default function App({
 
 									<div className="pt-3" />
 
-									<p className="font-light text-white">
+									<p className="text-white">
 										{conversation.messages
 											.at(-1)
 											?.content.slice(0, 100) +
@@ -808,7 +808,7 @@ export default function App({
 								</div>
 							))
 						) : (
-							<p className="text-lg font-light text-white">
+							<p className="text-lg text-white">
 								No one has started a conversation with you yet,
 								but this is where they&apos;ll appear.
 							</p>
@@ -944,7 +944,7 @@ export default function App({
 
 									<div className="pt-3" />
 
-									<p className="font-light text-white">
+									<p className="text-white">
 										{conversation.messages.at(-1)?.me && (
 											<span className="text-white/50">
 												Me:{" "}
@@ -973,7 +973,7 @@ export default function App({
 								</div>
 							))
 						) : (
-							<p className="text-lg font-light text-white">
+							<p className="text-lg text-white">
 								You haven&apos;t started any conversations with
 								anyone yet, but this is where they&apos;ll
 								appear.

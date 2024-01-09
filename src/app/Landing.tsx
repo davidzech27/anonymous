@@ -101,7 +101,7 @@ export default function Landing({
 		{
 			first: firstNameInput === "",
 			last: lastNameInput === "",
-			number: phoneNumberInput === "",
+			number: phoneNumberInput.match(/\d/g)?.length !== 11,
 			otp: otpInput === "",
 		}[screen] || submitting
 

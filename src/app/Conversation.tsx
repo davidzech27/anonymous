@@ -296,9 +296,9 @@ export default function Conversation({
 			)}
 
 			<div className="relative">
-				{typingIndicator && (
-					<div className="absolute -top-[48px] rounded-md border border-white bg-primary px-3 py-2">
-						<span className="font-medium text-white">
+				{!typingIndicator && (
+					<div className="absolute -top-[40px] rounded-md border border-white bg-primary px-2 py-1">
+						<span className="text-sm font-medium text-white">
 							{user.firstName ?? "user"} is typing
 							{Array(typingIndicatorDots).fill(".")}
 						</span>

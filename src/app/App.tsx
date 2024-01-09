@@ -876,6 +876,7 @@ export default function App({
 								</div>
 							) : (
 								<Conversation
+									key={conversationId}
 									id={conversationId}
 									special={conversation.special}
 									user={conversation.user}

@@ -31,9 +31,9 @@ const sendOTPAction = zact(
 		}
 	}
 
-	const otp = Math.floor(Math.random() * 1000000)
+	const otp = `"${Math.floor(Math.random() * 1000000)
 		.toString()
-		.padStart(6, "0")
+		.padStart(6, "0")}"`
 
 	await Promise.all([
 		sms.send({

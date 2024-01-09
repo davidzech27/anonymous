@@ -11,12 +11,7 @@ import { setAuth } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import triggerPotentialSpecialMessage from "./triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
 import kv from "~/kv/kv"
-import {
-	OTP,
-	resendCoolingDown,
-	verificationAttempts,
-	verificationCoolingDown,
-} from "~/kv/schema"
+import { OTP, verificationAttempts, verificationCoolingDown } from "~/kv/schema"
 import otpConstants from "./otpConstants"
 import sms from "~/sms/sms"
 

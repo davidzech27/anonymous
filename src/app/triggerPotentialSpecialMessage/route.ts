@@ -160,7 +160,7 @@ async function handler(req: NextRequest) {
 
 		const secondCreatedAt = new Date()
 
-		const secondContent = `try picking someone from the user list to send an anonymous message to--they'll (probably) never know it's you!`
+		const secondContent = `try picking someone from the user list to send an anonymous message to—they'll (probably) never know it's you!`
 
 		const [secondCreatedMessageRow] = await db
 			.insert(message)

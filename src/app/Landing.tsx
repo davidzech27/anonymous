@@ -93,12 +93,15 @@ export default function Landing({
 
 	const [otpInput, setOTPInput] = useState("")
 
-	const [screen, setScreen] = useState<"name" | "number" | "otp">("name")
+	const [screen, setScreen] = useState<"intro" | "name" | "number" | "otp">(
+		"intro"
+	)
 
 	const [submitting, setSubmitting] = useState(false)
 
 	const disabled =
 		{
+			intro: false,
 			name: fullNameInput === "",
 			number: phoneNumberInput.match(/\d/g)?.length !== 11,
 			otp: otpInput === "",
@@ -173,8 +176,8 @@ export default function Landing({
 		<main className="flex h-full flex-col items-center justify-between bg-primary p-6 mobile:p-5">
 			<h1 className="text-2xl font-bold text-secondary">mchsanonymous</h1>
 
-			<div className="flex flex-col items-center">
-				{invitedByUser !== undefined && (
+			<div className="flex w-full flex-col items-center">
+				{invitedByUser !== undefined && screen === "intro" && (
 					<>
 						<h2 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">
 							{invitedByUser.firstName} {invitedByUser.lastName}{" "}
@@ -184,169 +187,183 @@ export default function Landing({
 						<div className="pt-16" />
 					</>
 				)}
-
-				{
+				<div className="flex h-24 w-full flex-col items-center justify-end">
 					{
-						name: (
-							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
-								send and receive anonymous messages from people
-								at maria carrillo high school
-							</h2>
-						),
-						number: (
-							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
-								we need your phone number to verify your
-								identity. we won&apos;t sell it to{" "}
-								<span className="underline">anyone</span>.
-							</h2>
-						),
-						otp: (
-							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
-								we just sent you a code.
-							</h2>
-						),
-					}[screen]
-				}
-
-				<div className="pt-16 mobile:pt-8" />
-
-				<form
-					onSubmit={async (e) => {
-						e.preventDefault()
-
-						if (screen === "name") setScreen("number")
-
-						if (screen === "number") {
-							setScreen("otp")
-
-							await onSendOTP()
-						}
-
-						if (screen === "otp") await onSubmit()
-					}}
-					className="flex w-min flex-col items-center space-y-6 mobile:w-auto"
-				>
-					<div className="flex w-full space-x-2">
-						<TextInput
-							type={
-								{
-									name: "text" as const,
-									number: "tel" as const,
-									otp: "number" as const,
-								}[screen]
-							}
-							value={
-								{
-									name: fullNameInput,
-									number: phoneNumberInput,
-									otp: otpInput,
-								}[screen]
-							}
-							onChangeValue={(value) =>
-								({
-									name: setFullNameInput,
-									number: onChangePhoneNumberInput,
-									otp: setOTPInput,
-								}[screen](value))
-							}
-							aria-required
-							aria-label={
-								{
-									name: "full name",
-									number: "phone number",
-									otp: "code",
-								}[screen]
-							}
-							placeholder={
-								{
-									name: "full name",
-									number: "phone number",
-									otp: "code",
-								}[screen]
-							}
-							autoComplete={
-								{
-									name: "name" as const,
-									number: "tel" as const,
-									otp: "one-time-code" as const,
-								}[screen]
-							}
-							className="flex-1"
-						/>
-
-						<Button type="submit" disabled={disabled}>
-							{
-								{
-									name: "continue",
-									number: "continue",
-									otp: "join",
-								}[screen]
-							}
-						</Button>
-					</div>
-
-					<div
-						className={cn(
-							"space-y-2",
-							screen === "name" && "opacity-0"
-						)}
-					>
-						<div className="flex items-center justify-between">
-							<label
-								htmlFor="opt-in-checkbox"
-								className="select-none text-sm text-white"
-							>
-								uncheck this box to opt out of SMS notifications
-							</label>
-
-							<div className="relative inline-block h-4 w-4">
-								<input
-									type="checkbox"
-									checked={smsNotificationConsentInput}
-									onChange={(e) =>
-										setSmsNotificationConsentInput(
-											e.target.checked
-										)
-									}
-									id="opt-in-checkbox"
-									className="peer absolute inset-0 z-10 cursor-pointer opacity-0"
-								/>
-
-								<span className="absolute left-0 top-0 h-4 w-4 rounded-[4px] border border-secondary bg-primary peer-focus-visible:ring" />
-
-								<span className="absolute left-[8px] top-[7px] h-[4.5px] w-[9.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 transform border-2 border-r-0 border-t-0 border-secondary opacity-0 peer-checked:opacity-100" />
-							</div>
-						</div>
-
-						<p className="text-[10px] text-white/70">
-							notifications indicate the number of unread messages
-							you have, if any, and are sent at most once per day.
-							you can opt out later at any time by replying STOP.
-							message frequency may vary, Msg&Data rates may
-							apply.
-						</p>
-					</div>
-				</form>
-
-				<div className="pt-16 mobile:pt-8" />
-
-				<div className="space-y-2 text-center">
-					<h2 className="text-4xl font-bold text-secondary mobile:text-2xl">
-						{userCount} students already here
-					</h2>
-
-					{lastJoinedUser ? (
-						<div
-							className="text-2xl font-bold text-secondary mobile:text-lg"
-							aria-live="polite"
-						>
-							{lastJoinedUser.firstName} {lastJoinedUser.lastName}{" "}
-							just joined
-						</div>
-					) : (
-						<div className="h-8 mobile:h-7" />
-					)}
+						{
+							intro: (
+								<h2 className="w-1/2 text-center text-4xl font-bold leading-normal text-secondary mobile:w-full mobile:text-2xl">
+									send and receive anonymous messages from
+									people at maria carrillo high school
+								</h2>
+							),
+							name: (
+								<h2 className="w-1/2 text-center text-4xl font-bold leading-normal text-secondary mobile:w-full mobile:text-2xl">
+									what&apos;s your name?
+								</h2>
+							),
+							number: (
+								<h2 className="w-1/2 text-center text-4xl font-bold leading-normal text-secondary mobile:w-full mobile:text-2xl">
+									we need your phone number to verify your
+									identity. we won&apos;t sell it to{" "}
+									<span className="underline">anyone</span>.
+								</h2>
+							),
+							otp: (
+								<h2 className="w-1/2 text-center text-4xl font-bold leading-normal text-secondary mobile:w-full mobile:text-2xl">
+									we just sent you a code.
+								</h2>
+							),
+						}[screen]
+					}
 				</div>
+				<div className="pt-16 mobile:pt-12" />
+				{screen === "intro" ? (
+					<Button
+						onClick={() => setScreen("name")}
+						className="w-96 py-3 text-2xl mobile:max-w-[calc(100vw-40px)]"
+					>
+						continue
+					</Button>
+				) : (
+					<form
+						onSubmit={async (e) => {
+							e.preventDefault()
+
+							if (screen === "name") setScreen("number")
+
+							if (screen === "number") {
+								setScreen("otp")
+
+								await onSendOTP()
+							}
+
+							if (screen === "otp") await onSubmit()
+						}}
+						className="flex w-96 flex-col items-center space-y-6 mobile:max-w-[calc(100vw-40px)]"
+					>
+						<div className="flex w-full space-x-2">
+							<TextInput
+								type={
+									{
+										name: "text" as const,
+										number: "tel" as const,
+										otp: "number" as const,
+									}[screen]
+								}
+								value={
+									{
+										name: fullNameInput,
+										number: phoneNumberInput,
+										otp: otpInput,
+									}[screen]
+								}
+								onChangeValue={(value) =>
+									({
+										name: setFullNameInput,
+										number: onChangePhoneNumberInput,
+										otp: setOTPInput,
+									}[screen](value))
+								}
+								aria-required
+								aria-label={
+									{
+										name: "full name",
+										number: "phone number",
+										otp: "code",
+									}[screen]
+								}
+								placeholder={
+									{
+										name: "full name",
+										number: "phone number",
+										otp: "code",
+									}[screen]
+								}
+								autoComplete={
+									{
+										name: "name" as const,
+										number: "tel" as const,
+										otp: "one-time-code" as const,
+									}[screen]
+								}
+								className="flex-1"
+							/>
+
+							<Button type="submit" disabled={disabled}>
+								{
+									{
+										name: "continue",
+										number: "continue",
+										otp: "join",
+									}[screen]
+								}
+							</Button>
+						</div>
+
+						<div
+							className={cn(
+								"space-y-2",
+								screen === "name" && "opacity-0"
+							)}
+						>
+							<div className="flex items-center justify-between">
+								<label
+									htmlFor="opt-in-checkbox"
+									className="select-none text-sm text-white"
+								>
+									uncheck this box to opt out of SMS
+									notifications
+								</label>
+
+								<div className="relative inline-block h-4 w-4">
+									<input
+										type="checkbox"
+										checked={smsNotificationConsentInput}
+										onChange={(e) =>
+											setSmsNotificationConsentInput(
+												e.target.checked
+											)
+										}
+										id="opt-in-checkbox"
+										className="peer absolute inset-0 z-10 cursor-pointer opacity-0"
+									/>
+
+									<span className="absolute left-0 top-0 h-4 w-4 rounded-[4px] border border-secondary bg-primary peer-focus-visible:ring" />
+
+									<span className="absolute left-[8px] top-[7px] h-[4.5px] w-[9.5px] -translate-x-1/2 -translate-y-1/2 -rotate-45 transform border-2 border-r-0 border-t-0 border-secondary opacity-0 peer-checked:opacity-100" />
+								</div>
+							</div>
+
+							<p className="text-[10px] text-white/70">
+								notifications indicate the number of unread
+								messages you have, if any, and are sent at most
+								once per day. you can opt out later at any time
+								by replying STOP. message frequency may vary,
+								Msg&Data rates may apply.
+							</p>
+						</div>
+					</form>
+				)}
+				<div className="pt-16 mobile:pt-12" />
+				{screen === "intro" && (
+					<div className="space-y-2 text-center">
+						<h2 className="text-4xl font-bold text-secondary mobile:text-2xl">
+							{userCount} students already here
+						</h2>
+
+						{lastJoinedUser ? (
+							<div
+								className="text-2xl font-bold text-secondary mobile:text-lg"
+								aria-live="polite"
+							>
+								{lastJoinedUser.firstName}{" "}
+								{lastJoinedUser.lastName} just joined
+							</div>
+						) : (
+							<div className="h-8 mobile:h-7" />
+						)}
+					</div>
+				)}{" "}
 			</div>
 
 			<div className="flex w-full justify-between px-[20%] mobile:px-0">

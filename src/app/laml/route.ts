@@ -25,7 +25,9 @@ export async function POST(request: Request) {
 <Response>
     <Message><Body>You've unsubscribed from messages from mchsanonymous. Reply with START to resubscribe to notifications.</Body></Message>
 </Response>`)
-	} else if (body === "START") {
+	}
+
+	if (body === "START") {
 		await db
 			.update(user)
 			.set({
@@ -37,11 +39,13 @@ export async function POST(request: Request) {
 <Response>
     <Message><Body>You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.</Body></Message>
 </Response>`)
-	} else if (body === "HELP") {
+	}
+
+	if (body === "HELP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Message><Body>This is where you'll receive notifications from mchsanonymous. Reach out to support@understand.school for further assistance. Reply with STOP to opt-out.</Body></Message>
-</Response>`)
+        <Response>
+            <Message><Body>This is where you'll receive notifications from mchsanonymous. Reach out to support@understand.school for further assistance. Reply with STOP to opt-out.</Body></Message>
+        </Response>`)
 	}
 
 	return new Response(null)

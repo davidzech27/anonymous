@@ -224,7 +224,13 @@ export default function Landing({
 				>
 					<div className="flex w-full space-x-2">
 						<TextInput
-							type={screen === "number" ? "tel" : "text"}
+							type={
+								{
+									name: "text" as const,
+									number: "tel" as const,
+									otp: "number" as const,
+								}[screen]
+							}
 							value={
 								{
 									name: fullNameInput,
@@ -254,7 +260,13 @@ export default function Landing({
 									otp: "code",
 								}[screen]
 							}
-							autoComplete="off"
+							autoComplete={
+								{
+									name: "name" as const,
+									number: "tel" as const,
+									otp: "one-time-code" as const,
+								}[screen]
+							}
 							className="flex-1"
 						/>
 

@@ -53,7 +53,7 @@ export default function Input({
 			aria-label={ariaLabel}
 			autoComplete={autoComplete}
 			className={cn(
-				"rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/60",
+				"rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/70",
 				className
 			)}
 		/>

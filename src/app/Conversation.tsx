@@ -3,6 +3,7 @@ import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
 import changeTypingStatusAction from "./changeTypingStatusAction"
 import Input from "~/components/Input"
+import Button from "~/components/Button"
 
 interface Props {
 	id: number | undefined
@@ -327,13 +328,9 @@ export default function Conversation({
 						className="w-full"
 					/>
 
-					<button
-						type="submit"
-						disabled={disabled}
-						className="select-none rounded-lg border border-white bg-white/20 px-4 text-lg font-bold text-white transition hover:bg-white/30 focus-visible:bg-white/30 disabled:pointer-events-none disabled:opacity-50"
-					>
+					<Button type="submit" disabled={disabled}>
 						send
-					</button>
+					</Button>
 				</form>
 			</div>
 		</div>

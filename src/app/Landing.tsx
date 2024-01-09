@@ -41,9 +41,7 @@ export default function Landing({
 	initialLastJoinedUserPromise,
 	invitedByUser,
 }: Props) {
-	const [firstNameInput, setFirstNameInput] = useState("")
-
-	const [lastNameInput, setLastNameInput] = useState("")
+	const [fullNameInput, setFullNameInput] = useState("")
 
 	const [smsNotificationConsentInput, setSmsNotificationConsentInput] =
 		useState(true)
@@ -91,16 +89,13 @@ export default function Landing({
 
 	const [otpInput, setOTPInput] = useState("")
 
-	const [screen, setScreen] = useState<"first" | "last" | "number" | "otp">(
-		"first"
-	)
+	const [screen, setScreen] = useState<"name" | "number" | "otp">("name")
 
 	const [submitting, setSubmitting] = useState(false)
 
 	const disabled =
 		{
-			first: firstNameInput === "",
-			last: lastNameInput === "",
+			name: fullNameInput === "",
 			number: phoneNumberInput.match(/\d/g)?.length !== 11,
 			otp: otpInput === "",
 		}[screen] || submitting
@@ -121,8 +116,8 @@ export default function Landing({
 		setSubmitting(true)
 
 		const response = await createUserAction({
-			firstName: firstNameInput,
-			lastName: lastNameInput,
+			firstName: fullNameInput.split(/\s/g)[0] ?? "",
+			lastName: fullNameInput.split(/\s/g)?.slice(1).join(" ") ?? "",
 			phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
 			otp: otpInput.trim(),
 			smsNotificationConsent: smsNotificationConsentInput,
@@ -186,9 +181,28 @@ export default function Landing({
 					</>
 				)}
 
-				<h2 className="text-center text-4xl font-bold text-secondary mobile:text-2xl">
-					send and receive anonymous messages from people at mchs
-				</h2>
+				{
+					{
+						name: (
+							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
+								send and receive anonymous messages from people
+								at maria carrillo high school
+							</h2>
+						),
+						number: (
+							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
+								we need your phone number to verify your
+								identity. we won&apos;t sell it to{" "}
+								<span className="underline">anyone</span>.
+							</h2>
+						),
+						otp: (
+							<h2 className="h-24 text-center text-4xl font-bold text-secondary mobile:text-2xl">
+								we just sent you a code.
+							</h2>
+						),
+					}[screen]
+				}
 
 				<div className="pt-16 mobile:pt-8" />
 
@@ -196,9 +210,7 @@ export default function Landing({
 					onSubmit={async (e) => {
 						e.preventDefault()
 
-						if (screen === "first") setScreen("last")
-
-						if (screen === "last") setScreen("number")
+						if (screen === "name") setScreen("number")
 
 						if (screen === "number") {
 							setScreen("otp")
@@ -215,16 +227,14 @@ export default function Landing({
 							type={screen === "number" ? "tel" : "text"}
 							value={
 								{
-									first: firstNameInput,
-									last: lastNameInput,
+									name: fullNameInput,
 									number: phoneNumberInput,
 									otp: otpInput,
 								}[screen]
 							}
 							onChangeValue={(value) =>
 								({
-									first: setFirstNameInput,
-									last: setLastNameInput,
+									name: setFullNameInput,
 									number: onChangePhoneNumberInput,
 									otp: setOTPInput,
 								}[screen](value))
@@ -232,18 +242,16 @@ export default function Landing({
 							aria-required
 							aria-label={
 								{
-									first: "first name",
-									last: "last name",
+									name: "full name",
 									number: "phone number",
 									otp: "code",
 								}[screen]
 							}
 							placeholder={
 								{
-									first: "first name",
-									last: "last name",
+									name: "full name",
 									number: "phone number",
-									otp: "we sent you a code",
+									otp: "code",
 								}[screen]
 							}
 							autoComplete="off"
@@ -253,8 +261,7 @@ export default function Landing({
 						<Button type="submit" disabled={disabled}>
 							{
 								{
-									first: "continue",
-									last: "continue",
+									name: "continue",
 									number: "continue",
 									otp: "join",
 								}[screen]
@@ -265,8 +272,7 @@ export default function Landing({
 					<div
 						className={cn(
 							"space-y-2",
-							(screen === "first" || screen === "last") &&
-								"opacity-0"
+							screen === "name" && "opacity-0"
 						)}
 					>
 						<div className="flex items-center justify-between">

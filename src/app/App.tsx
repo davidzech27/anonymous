@@ -679,6 +679,14 @@ export default function App({
 					...prevKnownConversations.slice(conversationIndex + 1),
 				]
 			})
+
+			setConversationId((conversationId) => {
+				if (message.conversationId === conversationId) {
+					void readConversationAction({ conversationId })
+				}
+
+				return conversationId
+			})
 		}, []),
 	})
 
@@ -807,7 +815,7 @@ export default function App({
 						)}
 					</div>
 
-					<div className="h-[calc(100%-58px)] space-y-3">
+					<div className="space-y-3">
 						{conversation === undefined && (
 							<Input
 								value={searchUsersInput}
@@ -818,7 +826,12 @@ export default function App({
 						)}
 
 						<div
-							className="relative h-full w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]"
+							className={cn(
+								"relative w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]",
+								conversation === undefined
+									? "h-[calc(100%-58px)]"
+									: "h-full"
+							)}
 							aria-live="polite"
 						>
 							{conversation === undefined ? (

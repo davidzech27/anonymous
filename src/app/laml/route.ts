@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 	} else if (body === "START") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Message><Body>You've subscribed to notifications from mchsanonymous. Notifications are sent at most once per day for unread mchsanonymous messages, if any. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.</Body></Message>
+    <Message><Body>You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.</Body></Message>
 </Response>`)
 	} else if (body === "HELP") {
 		return new Response(`<?xml version="1.0" encoding="UTF-8"?>

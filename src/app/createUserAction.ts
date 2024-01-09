@@ -99,7 +99,7 @@ const createUserAction = zact(
 			? sms.send({
 					to: phoneNumber,
 					content:
-						"You've subscribed to notifications from mchsanonymous. Notifications are sent at most once per day for unread mchsanonymous messages, if any. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
+						"You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.",
 			  })
 			: undefined
 

@@ -14,7 +14,7 @@ async function handler(req: NextRequest) {
 	if (body.reason === "userJoined") {
 		const { userId, invitedByUserId } = body
 
-		if (userId === 1) return
+		if (userId === 1) return new NextResponse(null)
 
 		const createdAt = new Date()
 

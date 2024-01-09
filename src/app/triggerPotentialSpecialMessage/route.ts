@@ -14,6 +14,8 @@ async function handler(req: NextRequest) {
 	if (body.reason === "userJoined") {
 		const { userId, invitedByUserId } = body
 
+		if (userId === 0) return
+
 		const createdAt = new Date()
 
 		const sendInvitedByUserMessagePromise = (async () => {

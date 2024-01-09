@@ -297,7 +297,7 @@ export default function Conversation({
 			)}
 
 			<div className="relative">
-				{!typingIndicator && (
+				{typingIndicator && (
 					<div className="absolute -top-[40px] rounded-md border border-white bg-primary px-2 py-1">
 						<span className="text-sm font-medium text-white">
 							{user.firstName ?? "user"} is typing

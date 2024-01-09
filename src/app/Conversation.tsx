@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect, Fragment } from "react"
+import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
+import changeTypingStatusAction from "./changeTypingStatusAction"
 
 interface Props {
 	id: number | undefined
@@ -101,6 +103,64 @@ export default function Conversation({
 		[...messages]
 			.reverse()
 			.findIndex((message) => message.content.includes("invitedBy"))
+
+	const [typingIndicator, setTypingIndicator] = useState(false)
+
+	const [typingIndicatorDots, setTypingIndicatorDots] = useState(3)
+
+	useEffect(() => {
+		const intervalId = setInterval(() => {
+			setTypingIndicatorDots((typingIndicatorDots) => {
+				typingIndicatorDots++
+
+				typingIndicatorDots %= 4
+
+				return typingIndicatorDots
+			})
+		}, 250)
+
+		return () => {
+			clearInterval(intervalId)
+		}
+	}, [])
+
+	const typing = useRef(false)
+
+	const stopTypingTimeout = useRef<NodeJS.Timeout>()
+
+	const onChangeInput = (input: string) => {
+		setInput(input)
+
+		if (!typing.current) {
+			typing.current = true
+
+			void changeTypingStatusAction({
+				typingStatus: true,
+			})
+		}
+
+		clearTimeout(stopTypingTimeout.current)
+
+		stopTypingTimeout.current = setTimeout(() => {
+			typing.current = false
+
+			stopTypingTimeout.current = undefined
+
+			void changeTypingStatusAction({
+				typingStatus: false,
+			})
+		}, 1000 * 3)
+	}
+
+	useRealtime({
+		channel: `user-${user.id}`,
+		event: `typing`,
+		onMessage: (message) => {
+			if (typeof message === "boolean") {
+				setTypingIndicator(message)
+			}
+		},
+	})
 
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
@@ -234,36 +294,47 @@ export default function Conversation({
 				<div className="flex-1" />
 			)}
 
-			<form
-				onSubmit={(e) => {
-					e.preventDefault()
+			<div className="relative">
+				{typingIndicator && (
+					<div className="absolute -top-[48px] rounded-md border border-white bg-primary px-3 py-2">
+						<span className="font-medium text-white">
+							{user.firstName ?? "user"} is typing
+							{Array(typingIndicatorDots).fill(".")}
+						</span>
+					</div>
+				)}
 
-					if (disabled) return
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
 
-					setInput("")
+						if (disabled) return
 
-					onSend(input)
-				}}
-				className="flex w-full space-x-3"
-			>
-				<input
-					type="text"
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					aria-required
-					aria-label="send a message"
-					placeholder="be nice"
-					className="w-full rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:font-light placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/60"
-				/>
+						setInput("")
 
-				<button
-					type="submit"
-					disabled={disabled}
-					className="select-none rounded-lg border border-white bg-white/20 px-4 text-lg font-bold text-white transition hover:bg-white/30 focus-visible:bg-white/30 disabled:pointer-events-none disabled:opacity-50"
+						onSend(input)
+					}}
+					className="flex w-full space-x-3"
 				>
-					send
-				</button>
-			</form>
+					<input
+						type="text"
+						value={input}
+						onChange={(e) => onChangeInput(e.target.value)}
+						aria-required
+						aria-label="send a message"
+						placeholder="be nice"
+						className="w-full rounded-lg border border-white bg-white/20 px-3 py-2 text-lg font-medium text-white outline-0 transition placeholder:select-none placeholder:font-light placeholder:text-white/50 focus:bg-white/30 focus:placeholder:text-white/60"
+					/>
+
+					<button
+						type="submit"
+						disabled={disabled}
+						className="select-none rounded-lg border border-white bg-white/20 px-4 text-lg font-bold text-white transition hover:bg-white/30 focus-visible:bg-white/30 disabled:pointer-events-none disabled:opacity-50"
+					>
+						send
+					</button>
+				</form>
+			</div>
 		</div>
 	)
 }

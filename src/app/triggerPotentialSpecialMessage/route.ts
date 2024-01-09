@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 import { verifySignatureEdge } from "@upstash/qstash/dist/nextjs"
 import { eq, sql, and } from "drizzle-orm"
 
-import env from "~/env.js"
+import env from "~/env.mjs"
 import { triggerPotentialSpecialMessageSchema } from "./triggerPotentialSpecialMessage"
 import db from "~/db/db"
 import { conversation, message, user } from "~/db/schema"

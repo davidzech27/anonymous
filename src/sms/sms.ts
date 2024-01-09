@@ -1,4 +1,4 @@
-import env from "~/env.js"
+import env from "~/env.mjs"
 
 const sms = {
 	send: async ({ to, content }: { to: number; content: string }) => {

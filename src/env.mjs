@@ -22,6 +22,7 @@ const env = createEnv({
 		SIGNALWIRE_SPACE_URL: z.string(),
 		SIGNALWIRE_PHONE_NUMBER: z.string(),
 		SIGNALWIRE_API_TOKEN: z.string(),
+		SNAP_APP_ID: z.string(),
 	},
 	client: {
 		NEXT_PUBLIC_URL: z.string().url(),
@@ -57,6 +58,7 @@ const env = createEnv({
 		SIGNALWIRE_API_TOKEN: process.env.SIGNALWIRE_API_TOKEN,
 		NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
 		NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+		SNAP_APP_ID: process.env.SNAP_APP_ID,
 	},
 })
 

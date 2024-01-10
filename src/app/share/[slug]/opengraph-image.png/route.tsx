@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation"
 import { ImageResponse } from "next/og"
 import { eq } from "drizzle-orm"
-import fs from "fs"
-import path from "path"
-import url from "url"
 
 import db from "~/db/db"
 import { conversation, message, user } from "~/db/schema"
@@ -153,7 +150,7 @@ export async function GET(request: Request) {
 								display: "flex",
 								width: "100%",
 								flexDirection: "column",
-								borderRadius: "0.375rem",
+								borderRadius: "1rem",
 								border: "1px solid white",
 								backgroundColor: "rgba(255, 255, 255, 0.2)",
 								padding: `${

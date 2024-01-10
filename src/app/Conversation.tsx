@@ -8,6 +8,7 @@ import Input from "~/components/Input"
 import Button from "~/components/Button"
 import SnapShare from "~/components/SnapShare"
 import env from "~/env.mjs"
+import cn from "~/util/cn"
 
 interface Props {
 	id: number | undefined
@@ -72,7 +73,9 @@ export default function Conversation({
 		}
 	}, [messages.length])
 
-	const [linkCopied, setLinkCopied] = useState(false)
+	const [inviteLinkCopied, setInviteLinkCopied] = useState(false)
+
+	const [shareLinkCopied, setShareLinkCopied] = useState(false)
 
 	const lastInviteIndex =
 		messages.length -
@@ -139,6 +142,14 @@ export default function Conversation({
 		},
 	})
 
+	const [selection, setSelection] = useState<
+		| {
+				start: number
+				end: number
+		  }
+		| undefined
+	>(undefined)
+
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
 			<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:items-end mobile:space-y-3">
@@ -164,15 +175,50 @@ export default function Conversation({
 
 					<div className="pr-3" />
 
-					<h1 className="text-2xl font-bold leading-none text-white">
-						{user.firstName !== undefined &&
-						user.lastName !== undefined
-							? `${user.firstName} ${user.lastName}`
-							: `#${id}`}
-					</h1>
+					{selection === undefined ? (
+						<h1 className="text-2xl font-bold leading-none text-white">
+							{user.firstName !== undefined &&
+							user.lastName !== undefined
+								? `${user.firstName} ${user.lastName}`
+								: `#${id}`}
+						</h1>
+					) : (
+						<h1 className="text-2xl font-bold leading-none text-white">
+							{selection.end - selection.start + 1} selected
+						</h1>
+					)}
 				</div>
 
+				{selection !== undefined && (
+					<div className="flex items-center space-x-4">
+						<div
+							onClick={async () => {
+								setInviteLinkCopied(true)
+
+								await navigator.clipboard.writeText(
+									`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}`
+								)
+							}}
+							role="button"
+							className="flex select-none space-x-1 whitespace-pre text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:whitespace-pre-wrap mobile:text-base"
+						>
+							<span className="text-sm font-bold">
+								{!shareLinkCopied
+									? "copy share link"
+									: "share link copied"}
+							</span>
+
+							<Link className="h-4 w-4" />
+						</div>
+
+						<SnapShare
+							url={`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}`}
+						/>
+					</div>
+				)}
+
 				{!special &&
+					selection === undefined &&
 					(!user.blocked ? (
 						<div
 							onClick={onBlock}
@@ -200,7 +246,55 @@ export default function Conversation({
 				>
 					{messages.map((message, index) => (
 						<Fragment key={message.id}>
-							<div className="flex flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3">
+							<div
+								onClick={() => {
+									setSelection((selection) => {
+										if (selection === undefined) {
+											return {
+												start: index + 1,
+												end: index + 1,
+											}
+										} else if (
+											selection.start - 1 === index &&
+											selection.end - 1 === index
+										) {
+											setShareLinkCopied(false)
+
+											return undefined
+										} else if (
+											index >= selection.start - 1 &&
+											index <= selection.end - 1
+										) {
+											return {
+												start: selection.start,
+												end: index + 1,
+											}
+										} else if (
+											index <
+											selection.start - 1
+										) {
+											return {
+												start: index + 1,
+												end: selection.end,
+											}
+										} else if (index > selection.end - 1) {
+											return {
+												start: selection.start,
+												end: index + 1,
+											}
+										} else {
+											return selection
+										}
+									})
+								}}
+								className={cn(
+									"flex cursor-pointer flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3 transition hover:bg-white/30",
+									selection !== undefined &&
+										index >= selection.start - 1 &&
+										index <= selection.end - 1 &&
+										"bg-white/40 hover:bg-white/40"
+								)}
+							>
 								<div className="text-lg font-bold leading-none text-secondary">
 									{message.me
 										? "me"
@@ -232,21 +326,19 @@ export default function Conversation({
 								<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3">
 									<div
 										onClick={async () => {
-											setLinkCopied(true)
+											setInviteLinkCopied(true)
 
 											await navigator.clipboard.writeText(
-												message.content.match(
-													/(https:\/\/[^\s]+)/g
-												)?.[0] ?? ""
+												`${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`
 											)
 										}}
 										role="button"
 										className="flex items-center space-x-1 text-white hover:opacity-75"
 									>
 										<span className="text-sm font-bold">
-											{!linkCopied
-												? "copy link"
-												: "link copied"}
+											{!inviteLinkCopied
+												? "copy invite link"
+												: "invite link copied"}
 										</span>
 
 										<Link className="h-4 w-4" />

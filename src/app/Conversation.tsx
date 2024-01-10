@@ -193,7 +193,7 @@ export default function Conversation({
 					<div className="flex items-center space-x-4">
 						<div
 							onClick={async () => {
-								setInviteLinkCopied(true)
+								setShareLinkCopied(true)
 
 								await navigator.clipboard.writeText(
 									`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}`

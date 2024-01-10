@@ -10,6 +10,7 @@ import cn from "~/util/cn"
 import sendOTPAction from "./sendOTPAction"
 import Button from "~/components/Button"
 import TextInput from "~/components/Input"
+import { posthog } from "posthog-js"
 
 interface Props {
 	initialUserCount: number
@@ -133,7 +134,13 @@ export default function Landing({
 
 		if (response?.status === "error") {
 			alert(response.status)
-		} else {
+		} else if (response.status === "success") {
+			posthog.identify(response.userId.toString(), {
+				phoneNumber: response.phoneNumber,
+				firstName: response.firstName,
+				lastName: response.lastName,
+			})
+
 			location.reload()
 		}
 	}

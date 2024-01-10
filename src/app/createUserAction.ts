@@ -148,6 +148,14 @@ You've subscribed to notifications from mchsanonymous. Notifications indicating 
 			expireAttemptsPromise,
 			deleteKeysPromise,
 		])
+
+		return {
+			status: "success" as const,
+			userId: createdUserRow.id,
+			phoneNumber,
+			firstName: firstName.trim().slice(0, 50),
+			lastName: lastName.trim().slice(0, 50),
+		}
 	}
 )
 

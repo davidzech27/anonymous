@@ -25,6 +25,13 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" className="bg-primary">
+			<head>
+				<meta
+					property="snapchat:sticker"
+					content={`${env.URL}/opengraph-image.png`}
+				/>
+			</head>
+
 			<Suspense>
 				<PostHogPageview />
 			</Suspense>

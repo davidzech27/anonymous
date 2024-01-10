@@ -53,6 +53,13 @@ export default function RootLayout({
       sjs.parentNode.insertBefore(js, sjs);
     })(document, "script", "snapkit-creative-kit-sdk");`}
 			</Script>
+
+			<div className="hidden">
+				<div
+					className="snapchat-creative-kit-share"
+					id="snapchat-creative-kit-share"
+				/>
+			</div>
 		</html>
 	)
 }

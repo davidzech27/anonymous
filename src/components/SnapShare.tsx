@@ -11,6 +11,8 @@ export default function SnapShare({ url }: Props) {
 				const left = window.innerWidth / 2 - width / 2
 				const top = window.innerHeight / 2 - height / 2 + 48
 
+				document.getElementById("snapchat-creative-kit-share")?.click()
+
 				window.open(
 					`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(
 						url
@@ -19,7 +21,6 @@ export default function SnapShare({ url }: Props) {
 					`width=${width},height=${height},left=${left},top=${top}`
 				)
 			}}
-			id="snapchat-creative-kit-share"
 			data-snapchat-creative-kit-share-button="true"
 			className="snapchat-creative-kit-share"
 		>

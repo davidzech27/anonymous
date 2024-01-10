@@ -113,7 +113,7 @@ export async function GET(request: Request) {
 						paddingTop: `${
 							snapchatSticker
 								? 32
-								: [32, 32, 32][selectedMessages.length - 1]
+								: [32, 30, 28][selectedMessages.length - 1]
 						}px`,
 					}}
 				>

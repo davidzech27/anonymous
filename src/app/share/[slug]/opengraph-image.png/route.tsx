@@ -7,6 +7,7 @@ import url from "url"
 
 import db from "~/db/db"
 import { conversation, message, user } from "~/db/schema"
+import env from "~/env.mjs"
 
 const colors = {
 	primary: "#4A7460",
@@ -83,18 +84,8 @@ export async function GET(request: Request) {
 	const height = snapchatSticker ? 1200 : 630
 
 	const [mediumFont, boldFont] = await Promise.all([
-		fs.promises.readFile(
-			path.join(
-				url.fileURLToPath(import.meta.url),
-				"../../../../../../public/SF-Pro-Medium.otf"
-			)
-		),
-		fs.promises.readFile(
-			path.join(
-				url.fileURLToPath(import.meta.url),
-				"../../../../../../public/SF-Pro-Bold.otf"
-			)
-		),
+		fetch(`${env.URL}/SF-Pro-Medium.otf`).then((res) => res.arrayBuffer()),
+		fetch(`${env.URL}/SF-Pro-Bold.otf`).then((res) => res.arrayBuffer()),
 	])
 
 	const imageResponseBodyStream = new ImageResponse(

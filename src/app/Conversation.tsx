@@ -1,9 +1,13 @@
 import { useRef, useState, useEffect, Fragment } from "react"
+import { Mail, Link } from "lucide-react"
+
 import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
 import changeTypingStatusAction from "./changeTypingStatusAction"
 import Input from "~/components/Input"
 import Button from "~/components/Button"
+import SnapShare from "~/components/SnapShare"
+import env from "~/env.mjs"
 
 interface Props {
 	id: number | undefined
@@ -28,6 +32,7 @@ interface Props {
 		flagged: boolean
 		sentAt: Date
 	}[]
+	userId: number
 	onSend: (input: string) => void
 	onBlock: () => void
 	onUnblock: () => void
@@ -39,6 +44,7 @@ export default function Conversation({
 	user,
 	special,
 	messages,
+	userId,
 	onSend,
 	onBlock,
 	onUnblock,
@@ -67,37 +73,6 @@ export default function Conversation({
 	}, [messages.length])
 
 	const [linkCopied, setLinkCopied] = useState(false)
-
-	const snapchatCreativeKitShareRef = useRef<{ element: HTMLElement | null }>(
-		{ element: null }
-	)
-
-	useEffect(() => {
-		const snapchatCreativeKitShare = document.getElementById(
-			"snapchat-creative-kit-share"
-		)
-
-		if (snapchatCreativeKitShare !== null)
-			snapchatCreativeKitShareRef.current.element =
-				snapchatCreativeKitShare
-	}, [])
-
-	const snapchatCreativeKitShareParentRef = useRef<HTMLDivElement>(null)
-
-	const [snapchatCreativeKitShareParent] = useState(() => (
-		<div ref={snapchatCreativeKitShareParentRef} className="h-7" />
-	))
-
-	useEffect(() => {
-		if (
-			snapchatCreativeKitShareParentRef.current &&
-			snapchatCreativeKitShareRef.current.element !== null
-		) {
-			snapchatCreativeKitShareParentRef.current.appendChild(
-				snapchatCreativeKitShareRef.current.element
-			)
-		}
-	}, [messages])
 
 	const lastInviteIndex =
 		messages.length -
@@ -228,7 +203,7 @@ export default function Conversation({
 							<div className="flex flex-col space-y-3 rounded-lg border border-white bg-white/20 p-3">
 								<div className="text-lg font-bold leading-none text-secondary">
 									{message.me
-										? "Me"
+										? "me"
 										: user.firstName !== undefined &&
 										  user.lastName !== undefined
 										? `${user.firstName} ${user.lastName}`
@@ -266,14 +241,20 @@ export default function Conversation({
 											)
 										}}
 										role="button"
-										className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+										className="flex items-center space-x-1 text-white hover:opacity-75"
 									>
-										{!linkCopied
-											? "copy link"
-											: "link copied"}
+										<span className="text-sm font-bold">
+											{!linkCopied
+												? "copy link"
+												: "link copied"}
+										</span>
+
+										<Link className="h-4 w-4" />
 									</div>
 
-									{snapchatCreativeKitShareParent}
+									<SnapShare
+										url={`${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`}
+									/>
 
 									<a
 										href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
@@ -283,9 +264,13 @@ export default function Conversation({
 												)?.[0]
 											}`
 										)}`}
-										className="focus-visible:opacity-white text-sm font-bold text-white hover:opacity-75"
+										className="flex items-center space-x-1.5 text-white hover:opacity-75"
 									>
-										send email
+										<span className="text-sm font-bold">
+											send email
+										</span>
+
+										<Mail className="h-4 w-4" />
 									</a>
 								</div>
 							)}

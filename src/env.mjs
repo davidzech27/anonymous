@@ -24,6 +24,7 @@ const env = createEnv({
 		SIGNALWIRE_API_TOKEN: z.string(),
 	},
 	client: {
+		NEXT_PUBLIC_URL: z.string().url(),
 		NEXT_PUBLIC_SOKETI_HOST: z.string(),
 		NEXT_PUBLIC_SOKETI_PORT: z.coerce.number(),
 		NEXT_PUBLIC_SOKETI_APP_KEY: z.string(),
@@ -32,6 +33,7 @@ const env = createEnv({
 	},
 	runtimeEnv: {
 		URL: process.env.URL,
+		NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
 		NODE_ENV: process.env.NODE_ENV,
 		DATABASE_URL: process.env.DATABASE_URL,
 		DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,

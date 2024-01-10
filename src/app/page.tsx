@@ -2,7 +2,6 @@ import { cookies } from "next/headers"
 import { desc, sql, eq } from "drizzle-orm"
 import { unstable_noStore as noStore } from "next/cache"
 
-import env from "~/env.mjs"
 import db from "~/db/db"
 import { user, conversation, message, block } from "~/db/schema"
 import { getAuth } from "~/auth/jwt"
@@ -270,14 +269,6 @@ export default async function Index({
 
 	return (
 		<>
-			<div className="hidden">
-				<div
-					className="snapchat-creative-kit-share"
-					id="snapchat-creative-kit-share"
-					data-share-url={`${env.URL}/?invitedBy=${auth.id}`}
-				/>
-			</div>
-
 			<App
 				userId={auth.id}
 				initialUsers={users.map((user) =>

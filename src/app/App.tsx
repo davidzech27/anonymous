@@ -735,7 +735,7 @@ export default function App({
 			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
 				<main
 					className={cn(
-						"relative flex h-[calc(100%-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:pb-0",
+						"relative flex h-[calc(100%-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:p-5 mobile:pb-0",
 						{
 							anonymous: "mobile:right-0",
 							main: "mobile:right-[100vw]",
@@ -767,7 +767,7 @@ export default function App({
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
 										conversation.id === conversationId
-											? "bg-white/30"
+											? "bg-white/40"
 											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
 									)}
 								>
@@ -786,6 +786,12 @@ export default function App({
 									<div className="pt-3" />
 
 									<p className="text-white">
+										{conversation.messages.at(-1)?.me && (
+											<span className="text-white/50">
+												me:{" "}
+											</span>
+										)}
+
 										{conversation.messages
 											.at(-1)
 											?.content.slice(0, 100) +
@@ -881,6 +887,7 @@ export default function App({
 									special={conversation.special}
 									user={conversation.user}
 									messages={conversation.messages}
+									userId={userId}
 									onSend={
 										draftingUserId !== undefined
 											? onCreateConversation
@@ -926,7 +933,7 @@ export default function App({
 									className={cn(
 										"flex flex-col rounded-lg border border-white p-3 outline-none transition",
 										conversation.id === conversationId
-											? "bg-white/30"
+											? "bg-white/40"
 											: "bg-white/20 hover:bg-white/30 focus-visible:bg-white/30"
 									)}
 								>
@@ -948,7 +955,7 @@ export default function App({
 									<p className="text-white">
 										{conversation.messages.at(-1)?.me && (
 											<span className="text-white/50">
-												Me:{" "}
+												me:{" "}
 											</span>
 										)}
 
@@ -984,7 +991,7 @@ export default function App({
 				</main>
 			</div>
 
-			<nav className="hidden p-6 mobile:flex">
+			<nav className="hidden p-5 mobile:flex">
 				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => setScreen("anonymous")}

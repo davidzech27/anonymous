@@ -4,6 +4,7 @@ import Script from "next/script"
 import "./globals.css"
 import { PostHogProvider, PostHogPageview } from "~/posthog/components"
 import Body from "./Body"
+import env from "~/env.mjs"
 
 export const metadata = {
 	title: "mchsanonymous",
@@ -14,7 +15,7 @@ export const metadata = {
 		description:
 			"send and receive anonymous messages from people at your school",
 	},
-	metadataBase: new URL("https://mchsanonymous.vercel.app"),
+	metadataBase: new URL(env.URL),
 }
 
 export default function RootLayout({
@@ -24,13 +25,6 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" className="bg-primary">
-			<head>
-				<meta
-					property="snapchat:sticker"
-					content="https://mchsanonymous.vercel.app/opengraph-image.png"
-				/>
-			</head>
-
 			<Suspense>
 				<PostHogPageview />
 			</Suspense>

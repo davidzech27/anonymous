@@ -8,10 +8,11 @@ import db from "~/db/db"
 import { user, conversation } from "~/db/schema"
 import Button from "~/components/Button"
 import sendSMSNotificationsAction from "../sendSMSNotificationsAction"
+import triggerPotentialSpecialMessage from "../triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
 
 export default async function Admin() {
 	noStore()
-
+	// await triggerPotentialSpecialMessage({ reason: "userJoined", userId: 1 })
 	const auth = await getAuth({ cookies })
 
 	if (auth?.id !== 1) notFound()

@@ -26,6 +26,11 @@ export default function RootLayout({
 	return (
 		<html lang="en" className="bg-primary">
 			<head>
+				<meta
+					property="snapchat:sticker"
+					content={`${env.URL}/opengraph-image.png`}
+				/>
+
 				<meta property="snapchat:app_id" content={env.SNAP_APP_ID} />
 			</head>
 

@@ -86,11 +86,14 @@ export async function GET(request: Request) {
 		fs.promises.readFile(
 			path.join(
 				url.fileURLToPath(import.meta.url),
-				"../SF-Pro-Medium.otf"
+				"../../../../../../public/SF-Pro-Medium.otf"
 			)
 		),
 		fs.promises.readFile(
-			path.join(url.fileURLToPath(import.meta.url), "../SF-Pro-Bold.otf")
+			path.join(
+				url.fileURLToPath(import.meta.url),
+				"../../../../../../public/SF-Pro-Bold.otf"
+			)
 		),
 	])
 

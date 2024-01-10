@@ -155,7 +155,11 @@ export default function Conversation({
 			<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:items-end mobile:space-y-3">
 				<div className="flex w-full mobile:justify-between">
 					<svg
-						onClick={onClose}
+						onClick={
+							selection === undefined
+								? onClose
+								: () => setSelection(undefined)
+						}
 						fill="none"
 						height="24"
 						shapeRendering="geometricPrecision"

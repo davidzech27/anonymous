@@ -383,7 +383,7 @@ async function handler(req: NextRequest) {
 				})
 
 				const secondContent =
-					"you can also invite people by sharing your conversations. you can do so by clicking on the messages you want to share"
+					"you can also invite people by sharing your conversations. try clicking/tapping on the messages you want to share"
 
 				const secondSentAt = new Date()
 
@@ -410,9 +410,8 @@ async function handler(req: NextRequest) {
 					sentAt: secondSentAt,
 				})
 
-				await new Promise((res) => setTimeout(res, 1000 * 5))
-
-				const thirdContent = "you should invite someone fr fr"
+				const thirdContent =
+					"it might also be a good idea to post mchsanonymous invite links to your Instagram story"
 
 				const thirdSentAt = new Date()
 
@@ -437,6 +436,35 @@ async function handler(req: NextRequest) {
 					content: thirdContent,
 					flagged: false,
 					sentAt: thirdSentAt,
+				})
+
+				await new Promise((res) => setTimeout(res, 1000 * 5))
+
+				const fourthContent = "you should invite someone fr fr"
+
+				const fourthSentAt = new Date()
+
+				const [fourthCreatedMessageRow] = await db
+					.insert(message)
+					.values({
+						conversationId: specialConversationRow.id,
+						fromUserId: 1,
+						content: fourthContent,
+						flagged: false,
+						sentAt: fourthSentAt,
+					})
+					.returning({ id: message.id })
+					.all()
+
+				if (fourthCreatedMessageRow === undefined)
+					throw new Error("Failed to create message")
+
+				await realtime.trigger(fromUserId.toString(), "message", {
+					id: fourthCreatedMessageRow.id,
+					conversationId: specialConversationRow.id,
+					content: fourthContent,
+					flagged: false,
+					sentAt: fourthSentAt,
 				})
 			}
 		}

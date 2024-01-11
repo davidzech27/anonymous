@@ -349,14 +349,14 @@ async function handler(req: NextRequest) {
 						.where(eq(conversation.id, conversationId)),
 				])
 
-			const content = `hey, for every 3 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
-
 			if (
 				conversationRow?.knownUserId === fromUserId &&
 				specialConversationMessages.find(
 					(message) => message.content === content
 				) === undefined
 			) {
+				const content = `hey, for every 3 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
+
 				const sentAt = new Date()
 
 				const [createdMessageRow] = await db
@@ -382,9 +382,8 @@ async function handler(req: NextRequest) {
 					sentAt,
 				})
 
-				await new Promise((res) => setTimeout(res, 1000 * 5))
-
-				const secondContent = "you should invite someone fr fr"
+				const secondContent =
+					"you can also invite people by sharing your conversations. you can do so by clicking on the messages you want to share"
 
 				const secondSentAt = new Date()
 
@@ -409,6 +408,35 @@ async function handler(req: NextRequest) {
 					content: secondContent,
 					flagged: false,
 					sentAt: secondSentAt,
+				})
+
+				await new Promise((res) => setTimeout(res, 1000 * 5))
+
+				const thirdContent = "you should invite someone fr fr"
+
+				const thirdSentAt = new Date()
+
+				const [thirdCreatedMessageRow] = await db
+					.insert(message)
+					.values({
+						conversationId: specialConversationRow.id,
+						fromUserId: 1,
+						content: thirdContent,
+						flagged: false,
+						sentAt: thirdSentAt,
+					})
+					.returning({ id: message.id })
+					.all()
+
+				if (thirdCreatedMessageRow === undefined)
+					throw new Error("Failed to create message")
+
+				await realtime.trigger(fromUserId.toString(), "message", {
+					id: thirdCreatedMessageRow.id,
+					conversationId: specialConversationRow.id,
+					content: thirdContent,
+					flagged: false,
+					sentAt: thirdSentAt,
 				})
 			}
 		}

@@ -200,7 +200,7 @@ export default function Conversation({
 								setShareLinkCopied(true)
 
 								await navigator.clipboard.writeText(
-									`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}`
+									`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}?invitedBy=${userId}`
 								)
 							}}
 							role="button"
@@ -216,7 +216,7 @@ export default function Conversation({
 						</div>
 
 						<SnapShare
-							url={`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}`}
+							url={`${env.NEXT_PUBLIC_URL}/share/${userId},${id},${selection.start}-${selection.end}?invitedBy=${userId}`}
 						/>
 					</div>
 				)}

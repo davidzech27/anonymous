@@ -53,8 +53,10 @@ export async function generateMetadata({
 
 export default async function Share({
 	params,
+	searchParams,
 }: {
 	params: Record<string, unknown>
+	searchParams: Record<string, unknown>
 }) {
 	noStore()
 
@@ -152,7 +154,15 @@ export default async function Share({
 				))}
 			</div>
 
-			<a href="/">
+			<a
+				href={
+					auth === undefined &&
+					typeof searchParams.invitedBy === "string" &&
+					!isNaN(Number(searchParams.invitedBy))
+						? `/?invitedBy=${searchParams.invitedBy}`
+						: "/"
+				}
+			>
 				<Button className="h-16 w-full text-2xl">
 					{auth === undefined
 						? "join mchsanonymous"

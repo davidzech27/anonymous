@@ -1,20 +1,12 @@
 import { Suspense } from "react"
 import Script from "next/script"
+import { headers } from "next/headers"
 
-import "./globals.css"
+import "~/app/globals.css"
 import { PostHogProvider, PostHogPageview } from "~/posthog/components"
-import Body from "./Body"
 import env from "~/env.mjs"
 
 export const metadata = {
-	title: "mchsanonymous",
-	description:
-		"send and receive anonymous messages from people at your school",
-	openGraph: {
-		title: "mchsanonymous",
-		description:
-			"send and receive anonymous messages from people at your school",
-	},
 	metadataBase: new URL(env.URL),
 }
 
@@ -23,12 +15,16 @@ export default function RootLayout({
 }: {
 	children: React.ReactNode
 }) {
+	const url = new URL(headers().get("x-url") ?? "")
+
+	const pathname = url.pathname
+
 	return (
 		<html lang="en" className="bg-primary">
 			<head>
 				<meta
 					property="snapchat:sticker"
-					content={`${env.URL}/opengraph-image.png`}
+					content={`${env.URL}${pathname}/opengraph-image.png`}
 				/>
 
 				<meta property="snapchat:app_id" content={env.SNAP_APP_ID} />
@@ -39,7 +35,16 @@ export default function RootLayout({
 			</Suspense>
 
 			<PostHogProvider>
-				<Body>{children}</Body>
+				<body>
+					<div className="hidden">
+						<div
+							className="snapchat-creative-kit-share"
+							id="snapchat-creative-kit-share"
+						/>
+					</div>
+
+					{children}
+				</body>
 			</PostHogProvider>
 
 			<Script id="snapkit-creative-kit-sdk-loader">
@@ -53,13 +58,6 @@ export default function RootLayout({
       sjs.parentNode.insertBefore(js, sjs);
     })(document, "script", "snapkit-creative-kit-sdk");`}
 			</Script>
-
-			<div className="hidden">
-				<div
-					className="snapchat-creative-kit-share"
-					id="snapchat-creative-kit-share"
-				/>
-			</div>
 		</html>
 	)
 }

@@ -340,7 +340,7 @@ export default function Conversation({
 											role="button"
 											className="flex items-center space-x-1 text-white hover:opacity-75"
 										>
-											<span className="text-sm font-bold">
+											<span className="text-sm font-bold mobile:text-xs">
 												{!inviteLinkCopied
 													? "copy invite link"
 													: "invite link copied"}
@@ -363,7 +363,7 @@ export default function Conversation({
 											)}`}
 											className="flex items-center space-x-1.5 text-white hover:opacity-75"
 										>
-											<span className="text-sm font-bold">
+											<span className="text-sm font-bold mobile:text-xs">
 												send email
 											</span>
 

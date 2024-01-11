@@ -37,7 +37,7 @@ export default function Body({ children }: React.PropsWithChildren) {
 
 	return (
 		<body ref={ref} className="h-screen overflow-hidden">
-			{children}{" "}
+			{children}
 		</body>
 	)
 }

@@ -7,7 +7,7 @@ import { getAuth } from "~/auth/jwt"
 import db from "~/db/db"
 import { user, conversation } from "~/db/schema"
 import Button from "~/components/Button"
-import sendSMSNotificationsAction from "../sendSMSNotificationsAction"
+import sendSMSNotificationsAction from "../../(app)/sendSMSNotificationsAction"
 
 export default async function Admin() {
 	noStore()

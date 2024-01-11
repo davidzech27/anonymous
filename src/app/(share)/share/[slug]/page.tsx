@@ -47,7 +47,6 @@ export async function generateMetadata({
 			description,
 			images: `${env.URL}/share/${decodedSlug}/opengraph-image.png`,
 		},
-		metadataBase: new URL(env.URL),
 	} satisfies Metadata
 }
 

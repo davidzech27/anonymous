@@ -10,7 +10,7 @@ import { conversation, message, block } from "~/db/schema"
 import { getAuthOrThrow } from "~/auth/jwt"
 import realtime from "~/realtime/realtime"
 import moderateContent from "~/ai/moderateContent"
-import triggerPotentialSpecialMessage from "./triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
+import triggerPotentialSpecialMessage from "../triggerPotentialSpecialMessage/triggerPotentialSpecialMessage"
 
 const sendMessageAction = zact(
 	z.object({

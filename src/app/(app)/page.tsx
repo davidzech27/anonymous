@@ -11,7 +11,7 @@ import PreviewScreen from "./PreviewScreen"
 
 export const dynamic = "force-dynamic"
 
-const launchDate = new Date("Tues, 23 Jan 2024 0:0:0 GMT")
+const launchDate = new Date("Tues, 30 Jan 2024 0:0:0 GMT")
 
 export default async function Index({
 	searchParams,

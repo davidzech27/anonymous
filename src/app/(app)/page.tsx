@@ -7,8 +7,11 @@ import { user, conversation, message, block } from "~/db/schema"
 import { getAuth } from "~/auth/jwt"
 import Landing from "./Landing"
 import App from "./App"
+import PreviewScreen from "./PreviewScreen"
 
 export const dynamic = "force-dynamic"
+
+const launchDate = new Date("Tues, 23 Jan 2024 0:0:0 GMT")
 
 export default async function Index({
 	searchParams,
@@ -16,6 +19,10 @@ export default async function Index({
 	searchParams: Record<string, unknown>
 }) {
 	noStore()
+
+	if (new Date().getTime() < launchDate.getTime()) {
+		return <PreviewScreen launchDate={launchDate} />
+	}
 
 	const auth = await getAuth({ cookies })
 

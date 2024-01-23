@@ -31,7 +31,7 @@ export default function PreviewScreen({ launchDate }: Props) {
 	const seconds = Math.floor((difference / 1000) % 60)
 
 	return (
-		<main className="flex h-screen w-full items-center justify-center bg-primary">
+		<main className="flex h-[100dvh] w-full items-center justify-center bg-primary">
 			<div className="space-y-2">
 				<h1 className="text-2xl font-bold text-secondary">
 					mchsanonymous

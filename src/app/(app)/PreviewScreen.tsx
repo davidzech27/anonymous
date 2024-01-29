@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 useState
@@ -11,9 +12,15 @@ interface Props {
 export default function PreviewScreen({ launchDate }: Props) {
 	const [date, setDate] = useState(new Date())
 
+	const router = useRouter()
+
 	useEffect(() => {
 		const intervalId = setInterval(() => {
-			setDate(new Date())
+			if (new Date() > date) {
+				router.refresh()
+			} else {
+				setDate(new Date())
+			}
 		}, 1000)
 
 		return () => {

@@ -133,7 +133,9 @@ export default function Landing({
 		})
 
 		if (response?.status === "error") {
-			alert(response.status)
+			alert(response.message)
+
+			setSubmitting(false)
 		} else if (response.status === "success") {
 			posthog.identify(response.userId.toString(), {
 				phoneNumber: response.phoneNumber,

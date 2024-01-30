@@ -16,7 +16,7 @@ export default function PreviewScreen({ launchDate }: Props) {
 
 	useEffect(() => {
 		const intervalId = setInterval(() => {
-			if (new Date() > date) {
+			if (new Date() > launchDate) {
 				router.refresh()
 			} else {
 				setDate(new Date())

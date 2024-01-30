@@ -995,6 +995,7 @@ export default function App({
 				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => {
+							setDraftingUserId(undefined)
 							setConversationId(undefined)
 
 							setScreen("anonymous")
@@ -1039,6 +1040,7 @@ export default function App({
 				<div className="relative w-1/3 text-center">
 					<div
 						onClick={() => {
+							setDraftingUserId(undefined)
 							setConversationId(undefined)
 
 							setScreen("known")

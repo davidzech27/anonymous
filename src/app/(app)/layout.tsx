@@ -3,7 +3,6 @@ import Script from "next/script"
 
 import "~/app/globals.css"
 import { PostHogProvider, PostHogPageview } from "~/posthog/components"
-import Body from "./Body"
 import env from "~/env.mjs"
 
 export const metadata = {
@@ -39,7 +38,7 @@ export default function RootLayout({
 			</Suspense>
 
 			<PostHogProvider>
-				<Body>
+				<body className="h-[100dvh]">
 					<div className="hidden">
 						<div
 							className="snapchat-creative-kit-share"
@@ -48,7 +47,7 @@ export default function RootLayout({
 					</div>
 
 					{children}
-				</Body>
+				</body>
 			</PostHogProvider>
 
 			<Script id="snapkit-creative-kit-sdk-loader">

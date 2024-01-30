@@ -15,6 +15,7 @@
 	* {
 		box-sizing: border-box;
 		overscroll-behavior: none;
+		min-width: 0;
 	}
 
 	/* For webkit-based browsers (Chrome, Safari) */

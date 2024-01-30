@@ -170,7 +170,7 @@ export default function Conversation({
 						viewBox="0 0 24 24"
 						width="24"
 						aria-label="back to user list"
-						className="relative top-[1px] h-6 w-6 cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
+						className="relative top-[-3px] h-8 w-8 cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
 						tabIndex={0}
 					>
 						<path d="M18 6L6 18" />
@@ -410,7 +410,7 @@ export default function Conversation({
 						className="w-full"
 					/>
 
-					<Button type="submit" disabled={disabled}>
+					<Button type="submit" disabled={disabled} className="w-28">
 						send
 					</Button>
 				</form>

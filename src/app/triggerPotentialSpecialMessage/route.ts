@@ -178,6 +178,8 @@ async function handler(req: NextRequest) {
 			content: `if anyone you want to anonymously chat isn't on mchsanonymous, you should invite them! use this link: ${env.URL}/?invitedBy=${userId}`,
 		})
 
+		await new Promise((res) => setTimeout(res, 1000 * 1))
+
 		await sendMessage({
 			conversationId: createdConversationRow.id,
 			fromUserId: 1,
@@ -186,6 +188,8 @@ async function handler(req: NextRequest) {
 				`${env.URL}/?invitedBy=${userId}`
 			)}`,
 		})
+
+		await new Promise((res) => setTimeout(res, 1000 * 1))
 
 		await sendMessage({
 			conversationId: createdConversationRow.id,

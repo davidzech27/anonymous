@@ -8,6 +8,43 @@ import db from "~/db/db"
 import { conversation, message, user } from "~/db/schema"
 import realtime from "~/realtime/realtime"
 
+async function sendMessage({
+	conversationId,
+	fromUserId,
+	toUserId,
+	content,
+}: {
+	conversationId: number
+	fromUserId: number
+	toUserId: number
+	content: string
+}) {
+	const sentAt = new Date()
+
+	const [createdMessageRow] = await db
+		.insert(message)
+		.values({
+			conversationId,
+			fromUserId,
+			content,
+			flagged: false,
+			sentAt,
+		})
+		.returning({ id: message.id })
+		.all()
+
+	if (createdMessageRow === undefined)
+		throw new Error("Failed to create message")
+
+	await realtime.trigger(toUserId.toString(), "message", {
+		id: createdMessageRow.id,
+		conversationId,
+		content,
+		flagged: false,
+		sentAt,
+	})
+}
+
 async function handler(req: NextRequest) {
 	const body = triggerPotentialSpecialMessageSchema.parse(await req.json())
 
@@ -63,48 +100,30 @@ async function handler(req: NextRequest) {
 					invitedByUserRow.invitedUsers +
 					3 * invitedByUserRow.revealedUsers
 
-				const content = `${userRow.firstName} ${
-					userRow.lastName
-				} just joined using your invite link. this is your ${
-					invitedByUserRow.invitedUsers
-				}${
-					["th", "st", "nd", "rd"][
-						invitedByUserRow.invitedUsers > 10 &&
-						invitedByUserRow.invitedUsers < 20
-							? 0
-							: invitedByUserRow.invitedUsers % 10
-					] ?? "th"
-				} invited user. ${
-					usersAllowedToReveal > 0
-						? `you can pick ${
-								usersAllowedToReveal === 1
-									? "an anonymous conversation"
-									: `${usersAllowedToReveal} anonymous conversations`
-						  } to reveal the identity of the person with whom you're talking. just send the conversation #`
-						: `only ${usersLeft} more invites before you can pick an anonymous conversation to reveal the identity of the person with whom you're talking`
-				}`
-
-				const [createdMessageRow] = await db
-					.insert(message)
-					.values({
-						conversationId: specialConversationRow.id,
-						fromUserId: 1,
-						content,
-						flagged: false,
-						sentAt: createdAt,
-					})
-					.returning({ id: message.id })
-					.all()
-
-				if (createdMessageRow === undefined)
-					throw new Error("Failed to create message")
-
-				await realtime.trigger(invitedByUserId.toString(), "message", {
-					id: createdMessageRow.id,
+				await sendMessage({
 					conversationId: specialConversationRow.id,
-					content,
-					flagged: false,
-					sentAt: createdAt,
+					fromUserId: 1,
+					toUserId: invitedByUserId,
+					content: `${userRow.firstName} ${
+						userRow.lastName
+					} just joined using your invite link. this is your ${
+						invitedByUserRow.invitedUsers
+					}${
+						["th", "st", "nd", "rd"][
+							invitedByUserRow.invitedUsers > 10 &&
+							invitedByUserRow.invitedUsers < 20
+								? 0
+								: invitedByUserRow.invitedUsers % 10
+						] ?? "th"
+					} invited user. ${
+						usersAllowedToReveal > 0
+							? `you can pick ${
+									usersAllowedToReveal === 1
+										? "an anonymous conversation"
+										: `${usersAllowedToReveal} anonymous conversations`
+							  } to reveal the identity of the person with whom you're talking. just send the conversation #`
+							: `only ${usersLeft} more invites before you can pick an anonymous conversation to reveal the identity of the person with whom you're talking`
+					}`,
 				})
 			}
 		})()
@@ -125,91 +144,64 @@ async function handler(req: NextRequest) {
 		if (createdConversationRow === undefined)
 			throw new Error("Failed to create conversation")
 
-		const content = `welcome to mchsanonymous! send anyone you want anonymous messages—you can see who they are, but they won't be able to see who you are. remember not to cyberbully, or you will be banned. have fun!`
-
-		const [createdMessageRow] = await db
-			.insert(message)
-			.values({
-				conversationId: createdConversationRow.id,
-				fromUserId: 1,
-				content,
-				flagged: false,
-				sentAt: createdAt,
-			})
-			.returning({ id: message.id })
-			.all()
-
-		if (createdMessageRow === undefined)
-			throw new Error("Failed to create message")
-
-		await realtime.trigger(userId.toString(), "conversation", {
-			id: createdConversationRow.id,
-			anonymousUserId: 1,
-			special: true,
-			firstMessage: {
-				id: createdMessageRow.id,
-				content,
-				flagged: false,
-			},
-			createdAt,
+		await sendMessage({
+			conversationId: createdConversationRow.id,
+			fromUserId: 1,
+			toUserId: userId,
+			content: `welcome to mchsanonymous! send anyone you want anonymous messages—you can see who they are, but they won't be able to see who you are. remember not to cyberbully, or you will be banned. have fun!`,
 		})
 
 		await new Promise((res) => setTimeout(res, 1000 * 5))
 
-		const secondCreatedAt = new Date()
-
-		const secondContent = `try picking someone from the user list to send an anonymous message to—they'll (probably) never know it's you!`
-
-		const [secondCreatedMessageRow] = await db
-			.insert(message)
-			.values({
-				conversationId: createdConversationRow.id,
-				fromUserId: 1,
-				content: secondContent,
-				flagged: false,
-				sentAt: secondCreatedAt,
-			})
-			.returning({ id: message.id })
-			.all()
-
-		if (secondCreatedMessageRow === undefined)
-			throw new Error("Failed to create message")
-
-		await realtime.trigger(userId.toString(), "message", {
-			id: secondCreatedMessageRow.id,
+		await sendMessage({
 			conversationId: createdConversationRow.id,
-			content: secondContent,
-			flagged: false,
-			sentAt: secondCreatedAt,
+			fromUserId: 1,
+			toUserId: userId,
+			content: `try picking someone from your school to send an anonymous message to—they'll (probably) never know it's you!`,
 		})
 
 		await new Promise((res) => setTimeout(res, 1000 * 3))
 
-		const thirdCreatedAt = new Date()
-
-		const thirdContent = `it'll be fun i promise`
-
-		const [thirdCreatedMessageRow] = await db
-			.insert(message)
-			.values({
-				conversationId: createdConversationRow.id,
-				fromUserId: 1,
-				content: thirdContent,
-				flagged: false,
-				sentAt: thirdCreatedAt,
-			})
-			.returning({ id: message.id })
-			.all()
-
-		if (thirdCreatedMessageRow === undefined)
-			throw new Error("Failed to create message")
-
-		await realtime.trigger(userId.toString(), "message", {
-			id: thirdCreatedMessageRow.id,
+		await sendMessage({
 			conversationId: createdConversationRow.id,
-			content: thirdContent,
-			flagged: false,
-			sentAt: thirdCreatedAt,
+			fromUserId: 1,
+			toUserId: userId,
+			content: `it'll be fun i promise`,
+		})
+
+		await new Promise((res) => setTimeout(res, 1000 * 3))
+
+		await sendMessage({
+			conversationId: createdConversationRow.id,
+			fromUserId: 1,
+			toUserId: userId,
+			content: `if anyone you want to anonymously chat isn't on mchsanonymous, you should invite them! use this link: ${env.URL}/?invitedBy=${userId}`,
+		})
+
+		await sendMessage({
+			conversationId: createdConversationRow.id,
+			fromUserId: 1,
+			toUserId: userId,
+			content: `send it to a group chat, your DMs, or your Instagram story. or share to Snapchat using this link: https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(
+				`${env.URL}/?invitedBy=${userId}`
+			)}`,
+		})
+
+		await sendMessage({
+			conversationId: createdConversationRow.id,
+			fromUserId: 1,
+			toUserId: userId,
+			content:
+				"you can also invite people by sharing your conversations. try clicking/tapping on the messages you want to share",
+		})
+
+		await new Promise((res) => setTimeout(res, 1000 * 5))
+
+		await sendMessage({
+			conversationId: createdConversationRow.id,
+			fromUserId: 1,
+			toUserId: userId,
+			content: "you should invite someone fr fr",
 		})
 
 		await sendInvitedByUserMessagePromise
@@ -305,29 +297,11 @@ async function handler(req: NextRequest) {
 							.where(eq(user.id, fromUserId))
 					}
 
-					const sentAt = new Date()
-
-					const [createdMessageRow] = await db
-						.insert(message)
-						.values({
-							conversationId: specialConversationRow.id,
-							fromUserId: 1,
-							content,
-							flagged: false,
-							sentAt,
-						})
-						.returning({ id: message.id })
-						.all()
-
-					if (createdMessageRow === undefined)
-						throw new Error("Failed to create message")
-
-					await realtime.trigger(fromUserId.toString(), "message", {
-						id: createdMessageRow.id,
+					await sendMessage({
 						conversationId: specialConversationRow.id,
+						fromUserId: 1,
+						toUserId: fromUserId,
 						content,
-						flagged: false,
-						sentAt,
 					})
 				}
 			}
@@ -355,116 +329,11 @@ async function handler(req: NextRequest) {
 					(message) => message.content === content
 				) === undefined
 			) {
-				const content = `hey, for every 3 new people you invite here using your unique invite link, you'll get to reveal the identity of someone who's anonymously messaged you. here it is: ${inviteLink}. plus, this place will be a lot cooler when everyone you know is on it`
-
-				const sentAt = new Date()
-
-				const [createdMessageRow] = await db
-					.insert(message)
-					.values({
-						conversationId: specialConversationRow.id,
-						fromUserId: 1,
-						content,
-						flagged: false,
-						sentAt,
-					})
-					.returning({ id: message.id })
-					.all()
-
-				if (createdMessageRow === undefined)
-					throw new Error("Failed to create message")
-
-				await realtime.trigger(fromUserId.toString(), "message", {
-					id: createdMessageRow.id,
+				await sendMessage({
 					conversationId: specialConversationRow.id,
-					content,
-					flagged: false,
-					sentAt,
-				})
-
-				const secondContent =
-					"you can also invite people by sharing your conversations. try clicking/tapping on the messages you want to share"
-
-				const secondSentAt = new Date()
-
-				const [secondCreatedMessageRow] = await db
-					.insert(message)
-					.values({
-						conversationId: specialConversationRow.id,
-						fromUserId: 1,
-						content: secondContent,
-						flagged: false,
-						sentAt: secondSentAt,
-					})
-					.returning({ id: message.id })
-					.all()
-
-				if (secondCreatedMessageRow === undefined)
-					throw new Error("Failed to create message")
-
-				await realtime.trigger(fromUserId.toString(), "message", {
-					id: secondCreatedMessageRow.id,
-					conversationId: specialConversationRow.id,
-					content: secondContent,
-					flagged: false,
-					sentAt: secondSentAt,
-				})
-
-				const thirdContent =
-					"it might also be a good idea to post mchsanonymous invite links to your Instagram story"
-
-				const thirdSentAt = new Date()
-
-				const [thirdCreatedMessageRow] = await db
-					.insert(message)
-					.values({
-						conversationId: specialConversationRow.id,
-						fromUserId: 1,
-						content: thirdContent,
-						flagged: false,
-						sentAt: thirdSentAt,
-					})
-					.returning({ id: message.id })
-					.all()
-
-				if (thirdCreatedMessageRow === undefined)
-					throw new Error("Failed to create message")
-
-				await realtime.trigger(fromUserId.toString(), "message", {
-					id: thirdCreatedMessageRow.id,
-					conversationId: specialConversationRow.id,
-					content: thirdContent,
-					flagged: false,
-					sentAt: thirdSentAt,
-				})
-
-				await new Promise((res) => setTimeout(res, 1000 * 5))
-
-				const fourthContent = "you should invite someone fr fr"
-
-				const fourthSentAt = new Date()
-
-				const [fourthCreatedMessageRow] = await db
-					.insert(message)
-					.values({
-						conversationId: specialConversationRow.id,
-						fromUserId: 1,
-						content: fourthContent,
-						flagged: false,
-						sentAt: fourthSentAt,
-					})
-					.returning({ id: message.id })
-					.all()
-
-				if (fourthCreatedMessageRow === undefined)
-					throw new Error("Failed to create message")
-
-				await realtime.trigger(fromUserId.toString(), "message", {
-					id: fourthCreatedMessageRow.id,
-					conversationId: specialConversationRow.id,
-					content: fourthContent,
-					flagged: false,
-					sentAt: fourthSentAt,
+					fromUserId: 1,
+					toUserId: fromUserId,
+					content: `hey, for every 3 new people you invite here, you'll get to reveal the identity of someone who's anonymously messaged you. plus, this place will be a lot cooler when everyone you know is on it`,
 				})
 			}
 		}

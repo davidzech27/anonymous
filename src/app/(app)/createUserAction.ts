@@ -14,6 +14,7 @@ import kv from "~/kv/kv"
 import { OTP, verificationAttempts, verificationCoolingDown } from "~/kv/schema"
 import otpConstants from "./otpConstants"
 import sms from "~/sms/sms"
+import env from "~/env.mjs"
 
 const createUserAction = zact(
 	z.object({
@@ -130,6 +131,14 @@ const createUserAction = zact(
 				sms.send({
 					to: phoneNumber,
 					content: `Welcome to mchsanonymous! Send anyone you want anonymous messages—you can see who they are, but they won't be able to see who you are. Remember not to cyberbully, or you will be banned. Have fun!
+
+If anyone you want to anonymously chat isn't on mchsanonymous, you should invite them! Use this link: ${
+						env.URL
+					}/?invitedBy=${createdUserRow.id}
+
+Send it to a group chat, your DMs, or your Instagram story. Or share to Snapchat using this link: https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(
+						`${env.URL}/?invitedBy=${createdUserRow.id}`
+					)}
 
 You've subscribed to notifications from mchsanonymous. Notifications indicating the number of unread messages you have, if any, are sent at most once per day. Reply with STOP to opt-out. Message frequency depends on activity and Msg&Data rates may apply.`,
 				}),

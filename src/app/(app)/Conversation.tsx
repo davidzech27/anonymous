@@ -77,13 +77,6 @@ export default function Conversation({
 
 	const [shareLinkCopied, setShareLinkCopied] = useState(false)
 
-	const lastInviteIndex =
-		messages.length -
-		1 -
-		[...messages]
-			.reverse()
-			.findIndex((message) => message.content.includes("invitedBy"))
-
 	const [typingIndicator, setTypingIndicator] = useState(false)
 
 	const [typingIndicatorDots, setTypingIndicatorDots] = useState(3)
@@ -153,7 +146,7 @@ export default function Conversation({
 	return (
 		<div className="flex h-full flex-col space-y-3 p-3">
 			<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3 mobile:flex-col mobile:items-end mobile:space-y-3">
-				<div className="flex w-full mobile:justify-between">
+				<div className="flex mobile:w-full mobile:justify-between">
 					<svg
 						onClick={
 							selection === undefined
@@ -170,7 +163,7 @@ export default function Conversation({
 						viewBox="0 0 24 24"
 						width="24"
 						aria-label="back to user list"
-						className="relative top-[-3px] h-8 w-8 cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
+						className="relative h-[26px] w-[26px] cursor-pointer text-white outline-none hover:opacity-75 focus-visible:opacity-75"
 						tabIndex={0}
 					>
 						<path d="M18 6L6 18" />
@@ -327,7 +320,7 @@ export default function Conversation({
 							</div>
 
 							{(special || userId === 1) &&
-								index === lastInviteIndex && (
+								index === messages.length - 1 && (
 									<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3">
 										<div
 											onClick={async () => {
@@ -364,7 +357,7 @@ export default function Conversation({
 											className="flex items-center space-x-1.5 text-white hover:opacity-75"
 										>
 											<span className="text-sm font-bold mobile:text-[10px]">
-												send email
+												send email invite
 											</span>
 
 											<Mail className="h-4 w-4" />

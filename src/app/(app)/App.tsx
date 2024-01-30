@@ -833,9 +833,9 @@ export default function App({
 
 						<div
 							className={cn(
-								"relative w-[calc(50vw-24px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]",
+								"relative w-[calc(50vw-72px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]",
 								conversation === undefined
-									? "h-[calc(100%-58px)]"
+									? "h-[calc(100%-54px)]"
 									: "h-full"
 							)}
 							aria-live="polite"

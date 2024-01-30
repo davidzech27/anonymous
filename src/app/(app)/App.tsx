@@ -994,7 +994,11 @@ export default function App({
 			<nav className="hidden p-5 mobile:flex">
 				<div className="relative w-1/3 text-center">
 					<div
-						onClick={() => setScreen("anonymous")}
+						onClick={() => {
+							setConversationId(undefined)
+
+							setScreen("anonymous")
+						}}
 						role="button"
 						className={cn(
 							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
@@ -1034,7 +1038,11 @@ export default function App({
 
 				<div className="relative w-1/3 text-center">
 					<div
-						onClick={() => setScreen("known")}
+						onClick={() => {
+							setConversationId(undefined)
+
+							setScreen("known")
+						}}
 						role="button"
 						className={cn(
 							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",

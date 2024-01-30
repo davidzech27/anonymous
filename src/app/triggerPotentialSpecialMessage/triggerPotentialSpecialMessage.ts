@@ -28,5 +28,6 @@ export default async function triggerPotentialSpecialMessage(
 	await qstash.publishJSON({
 		body,
 		url: `${env.URL}/triggerPotentialSpecialMessage`,
+		contentBasedDeduplication: true,
 	})
 }

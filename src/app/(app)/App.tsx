@@ -1002,7 +1002,7 @@ export default function App({
 						}}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "anonymous" && "opacity-50"
 						)}
 					>
@@ -1020,7 +1020,7 @@ export default function App({
 						onClick={() => setScreen("main")}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "main" && "opacity-50"
 						)}
 					>
@@ -1047,7 +1047,7 @@ export default function App({
 						}}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold text-white transition",
+							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "known" && "opacity-50"
 						)}
 					>

@@ -94,13 +94,13 @@ async function handler(req: NextRequest) {
 					return
 
 				const usersAllowedToReveal =
-					Math.floor(invitedByUserRow.invitedUsers / 3) -
+					Math.floor(invitedByUserRow.invitedUsers / 5) -
 					invitedByUserRow.revealedUsers
 
 				const usersLeft =
-					3 -
+					5 -
 					invitedByUserRow.invitedUsers +
-					3 * invitedByUserRow.revealedUsers
+					5 * invitedByUserRow.revealedUsers
 
 				await sendMessage({
 					conversationId: specialConversationRow.id,
@@ -243,7 +243,7 @@ async function handler(req: NextRequest) {
 
 				if (userRow !== undefined) {
 					const usersAllowedToReveal =
-						Math.floor(userRow.invitedUsers / 3) -
+						Math.floor(userRow.invitedUsers / 5) -
 						userRow.revealedUsers
 
 					let content: string
@@ -252,7 +252,7 @@ async function handler(req: NextRequest) {
 
 					if (usersAllowedToReveal <= 0) {
 						const usersLeft =
-							3 * userRow.revealedUsers - userRow.invitedUsers + 3
+							5 * userRow.revealedUsers - userRow.invitedUsers + 5
 
 						content = `you still have to invite ${usersLeft} more users until you can reveal any${
 							userRow.revealedUsers > 0 ? " more" : ""
@@ -331,15 +331,15 @@ async function handler(req: NextRequest) {
 
 			if (
 				conversationRow?.knownUserId === fromUserId &&
-				specialConversationMessages.find(
-					(message) => message.content === content
+				specialConversationMessages.find((message) =>
+					message.content.includes("invite")
 				) === undefined
 			) {
 				await sendMessage({
 					conversationId: specialConversationRow.id,
 					fromUserId: 1,
 					toUserId: fromUserId,
-					content: `hey, for every 3 new people you invite here, you'll get to reveal the identity of someone who's anonymously messaged you. plus, this place will be a lot cooler when everyone you know is on it`,
+					content: `hey, for every 5 new people you invite here, you'll get to reveal the identity of someone who's anonymously messaged you. plus, this place will be a lot cooler when everyone you know is on it`,
 				})
 			}
 		}

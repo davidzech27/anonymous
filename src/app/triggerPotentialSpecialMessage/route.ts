@@ -8,6 +8,8 @@ import db from "~/db/db"
 import { conversation, message, user } from "~/db/schema"
 import realtime from "~/realtime/realtime"
 
+export const maxDuration = 60
+
 async function sendMessage({
 	conversationId,
 	fromUserId,

@@ -1,9 +1,19 @@
+import { useEffect, useState } from "react"
+
 interface Props {
 	url: string
 }
 
 export default function SnapShare({ url }: Props) {
-	return (
+	const [rendered, setRendered] = useState(false)
+
+	useEffect(() => {
+		if (!rendered) setRendered(true)
+	}, [rendered])
+
+	return !rendered ? (
+		<div className="h-[28px]" />
+	) : (
 		<div
 			onClick={() => {
 				const width = window.innerHeight * (2 / 3) + 48

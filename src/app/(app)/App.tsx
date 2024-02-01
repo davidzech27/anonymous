@@ -14,6 +14,8 @@ import formatDuration from "~/util/formatDuration"
 import Conversation from "./Conversation"
 import cn from "~/util/cn"
 import Input from "~/components/Input"
+import InviteBar from "./InviteBar"
+import Button from "~/components/Button"
 
 interface Props {
 	userId: number
@@ -105,6 +107,8 @@ export default function App({
 
 	const [draftingUserId, setDraftingUserId] = useState<number>()
 
+	const [draftingRandom, setDraftingRandom] = useState(false)
+
 	const [conversationId, setConversationId] = useState<number>()
 
 	const conversationIdRef = useRef<number>()
@@ -152,12 +156,19 @@ export default function App({
 				  }
 				: draftingUserId !== undefined
 				? {
-						user: users.find(({ id }) => id === draftingUserId) ?? {
-							id: 0,
-							firstName: undefined,
-							lastName: undefined,
-							blocked: false,
-						},
+						user: !draftingRandom
+							? users.find(({ id }) => id === draftingUserId) ?? {
+									id: 0,
+									firstName: undefined,
+									lastName: undefined,
+									blocked: false,
+							  }
+							: {
+									id: draftingUserId,
+									firstName: "random",
+									lastName: "user",
+									blocked: false,
+							  },
 						special: false,
 						unread: 0,
 						messages: [],
@@ -168,6 +179,7 @@ export default function App({
 			anonymousConversations,
 			knownConversations,
 			draftingUserId,
+			draftingRandom,
 			users,
 		]
 	)
@@ -732,10 +744,14 @@ export default function App({
 
 	return (
 		<div className="flex h-full flex-col bg-primary">
-			<div className="relative flex w-screen flex-1 flex-col overflow-hidden">
+			<div className="relative flex w-screen flex-1 flex-col space-y-3 overflow-hidden">
+				<div className="p-6 pb-0 mobile:p-5 mobile:pb-0">
+					<InviteBar userId={userId} />
+				</div>
+
 				<main
 					className={cn(
-						"relative flex h-[calc(100%-90px)] flex-1 space-x-3 p-6 transition-all mobile:w-[300vw] mobile:space-x-12 mobile:p-5 mobile:pb-0",
+						"relative flex h-[calc(100%-90px)] flex-1 space-x-3 p-6 pt-0 transition-all mobile:w-[300vw] mobile:space-x-10 mobile:p-5 mobile:pb-0 mobile:pt-0",
 						{
 							anonymous: "mobile:right-0",
 							main: "mobile:right-[100vw]",
@@ -745,7 +761,7 @@ export default function App({
 				>
 					<div
 						aria-live="polite"
-						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]"
+						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-40px)]"
 					>
 						{anonymousConversations.length !== 0 ? (
 							anonymousConversations.map((conversation) => (
@@ -833,9 +849,9 @@ export default function App({
 
 						<div
 							className={cn(
-								"relative w-[calc(50vw-72px)] rounded-lg border border-white mobile:w-[calc(100vw-48px)]",
+								"relative w-[calc(50vw-72px)] rounded-lg border border-white mobile:w-[calc(100vw-40px)]",
 								conversation === undefined
-									? "h-[calc(100%-54px)]"
+									? "h-[calc(100%-114px)]"
 									: "h-full"
 							)}
 							aria-live="polite"
@@ -907,11 +923,30 @@ export default function App({
 								/>
 							)}
 						</div>
+
+						{conversation === undefined && (
+							<Button
+								onClick={() => {
+									setDraftingUserId(
+										users[
+											Math.floor(
+												Math.random() * users.length
+											)
+										]?.id
+									)
+
+									setDraftingRandom(true)
+								}}
+								className="h-12 w-full"
+							>
+								send to random user
+							</Button>
+						)}
 					</div>
 
 					<div
 						aria-live="polite"
-						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-48px)]"
+						className="w-[25vw] space-y-3 overflow-y-auto rounded-lg border border-white p-3 mobile:w-[calc(100vw-40px)]"
 					>
 						{knownConversations.length !== 0 ? (
 							knownConversations.map((conversation) => (

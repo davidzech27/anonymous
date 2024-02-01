@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, Fragment } from "react"
-import { Mail, Link } from "lucide-react"
+import { Link } from "lucide-react"
 
 import useRealtime from "~/realtime/useRealtime"
 import formatDuration from "~/util/formatDuration"
@@ -72,8 +72,6 @@ export default function Conversation({
 				scrollerRef.current.clientHeight
 		}
 	}, [messages.length])
-
-	const [inviteLinkCopied, setInviteLinkCopied] = useState(false)
 
 	const [shareLinkCopied, setShareLinkCopied] = useState(false)
 
@@ -219,6 +217,9 @@ export default function Conversation({
 				)}
 
 				{!special &&
+					!(
+						user.firstName === "random" && user.lastName === "user"
+					) &&
 					selection === undefined &&
 					(!user.blocked ? (
 						<div
@@ -314,51 +315,6 @@ export default function Conversation({
 									</span>
 								</div>
 							</div>
-
-							{special && index === messages.length - 1 && (
-								<div className="flex items-center justify-between rounded-lg border border-white bg-white/20 p-3">
-									<div
-										onClick={async () => {
-											setInviteLinkCopied(true)
-
-											await navigator.clipboard.writeText(
-												`${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`
-											)
-										}}
-										role="button"
-										className="flex items-center space-x-1 text-white hover:opacity-75"
-									>
-										<span className="text-sm font-bold mobile:text-[10px]">
-											{!inviteLinkCopied
-												? "copy invite link"
-												: "invite link copied"}
-										</span>
-
-										<Link className="h-4 w-4" />
-									</div>
-
-									<SnapShare
-										url={`${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`}
-									/>
-
-									<a
-										href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
-											`I'm inviting you to mchsanonymous. Join here: ${
-												message.content.match(
-													/(https:\/\/[^\s]+)/g
-												)?.[0]
-											}`
-										)}`}
-										className="flex items-center space-x-1.5 text-white hover:opacity-75"
-									>
-										<span className="text-sm font-bold mobile:text-[10px]">
-											email invite
-										</span>
-
-										<Mail className="h-4 w-4" />
-									</a>
-								</div>
-							)}
 						</Fragment>
 					))}
 				</div>

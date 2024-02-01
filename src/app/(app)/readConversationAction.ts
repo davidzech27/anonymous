@@ -33,11 +33,14 @@ const readConversationAction = zact(
 	)
 		throw new Error("Not in conversation")
 
-	await db.update(conversation).set({
-		[conversationRow.anonymousUserId === auth.id
-			? "anonymousUnread"
-			: "knownUnread"]: 0,
-	})
+	await db
+		.update(conversation)
+		.set({
+			[conversationRow.anonymousUserId === auth.id
+				? "anonymousUnread"
+				: "knownUnread"]: 0,
+		})
+		.where(eq(conversation.id, conversationId))
 })
 
 export default readConversationAction

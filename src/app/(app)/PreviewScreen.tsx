@@ -26,7 +26,7 @@ export default function PreviewScreen({ launchDate }: Props) {
 		return () => {
 			clearInterval(intervalId)
 		}
-	}, [])
+	}, [launchDate, router])
 
 	const now = date.getTime()
 	const launchTime = launchDate.getTime()

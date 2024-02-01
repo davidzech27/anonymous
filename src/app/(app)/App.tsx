@@ -772,12 +772,12 @@ export default function App({
 									)}
 								>
 									<div className="flex justify-between">
-										<div className="text-lg font-bold leading-none text-secondary">
+										<div className="select-none text-lg font-bold leading-none text-secondary">
 											#{conversation.id}
 										</div>
 
 										{conversation.unread !== 0 && (
-											<div className="text-lg font-bold leading-none text-secondary">
+											<div className="select-none text-lg font-bold leading-none text-secondary">
 												{conversation.unread} unread
 											</div>
 										)}
@@ -785,7 +785,7 @@ export default function App({
 
 									<div className="pt-3" />
 
-									<p className="text-white">
+									<p className="select-none text-white">
 										{conversation.messages.at(-1)?.me && (
 											<span className="text-white/50">
 												me:{" "}
@@ -804,7 +804,7 @@ export default function App({
 									<div className="pt-3" />
 
 									<div className="flex justify-end">
-										<span className="text-lg font-bold leading-none text-secondary">
+										<span className="select-none text-lg font-bold leading-none text-secondary">
 											{formatDuration(
 												conversation.messages.at(-1)
 													?.sentAt ?? new Date()
@@ -857,7 +857,7 @@ export default function App({
 												role="button"
 												className="group relative flex flex-col rounded-lg border border-white bg-white/20 p-3"
 											>
-												<div className="text-lg font-bold leading-none text-secondary">
+												<div className="select-none text-lg font-bold leading-none text-secondary">
 													{user.firstName}{" "}
 													{user.lastName}
 												</div>
@@ -865,15 +865,15 @@ export default function App({
 												<div className="pt-3" />
 
 												<div className="flex justify-end">
-													<span className="text-lg font-bold leading-none text-secondary">
-														Joined{" "}
+													<span className="select-none text-lg font-bold leading-none text-secondary">
+														joined{" "}
 														{formatDuration(
 															user.createdAt
 														)}
 													</span>
 												</div>
 
-												<div className="pointer-events-none absolute inset-0 right-[1px] flex items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
+												<div className="pointer-events-none absolute inset-0 right-[1px] flex select-none items-center justify-center rounded-lg bg-white/[0.15] text-center text-2xl font-bold text-white opacity-0 backdrop-blur-md transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 mobile:text-lg">
 													send an anonymous message
 												</div>
 											</div>
@@ -938,13 +938,13 @@ export default function App({
 									)}
 								>
 									<div className="flex justify-between">
-										<div className="text-lg font-bold leading-none text-secondary">
+										<div className="select-none text-lg font-bold leading-none text-secondary">
 											{conversation.user.firstName}{" "}
 											{conversation.user.lastName}
 										</div>
 
 										{conversation.unread !== 0 && (
-											<div className="text-lg font-bold leading-none text-secondary">
+											<div className="select-none text-lg font-bold leading-none text-secondary">
 												{conversation.unread} unread
 											</div>
 										)}
@@ -952,7 +952,7 @@ export default function App({
 
 									<div className="pt-3" />
 
-									<p className="text-white">
+									<p className="select-none text-white">
 										{conversation.messages.at(-1)?.me && (
 											<span className="text-white/50">
 												me:{" "}
@@ -971,7 +971,7 @@ export default function App({
 									<div className="pt-3" />
 
 									<div className="flex justify-end">
-										<span className="text-lg font-bold leading-none text-secondary">
+										<span className="select-none text-lg font-bold leading-none text-secondary">
 											{formatDuration(
 												conversation.messages.at(-1)
 													?.sentAt ?? new Date()
@@ -1002,13 +1002,13 @@ export default function App({
 						}}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
+							"absolute inset-0 -right-[18px] flex select-none items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "anonymous" && "opacity-50"
 						)}
 					>
 						anonymous
 						{anonymousUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse select-none rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{anonymousUnread}
 							</div>
 						)}
@@ -1020,7 +1020,7 @@ export default function App({
 						onClick={() => setScreen("main")}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
+							"absolute inset-0 -right-[18px] flex select-none items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "main" && "opacity-50"
 						)}
 					>
@@ -1030,7 +1030,7 @@ export default function App({
 							: "users"}
 
 						{conversationUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse select-none rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{conversationUnread}
 							</div>
 						)}
@@ -1047,13 +1047,13 @@ export default function App({
 						}}
 						role="button"
 						className={cn(
-							"absolute inset-0 -right-[18px] flex items-center justify-center text-lg font-bold leading-none text-white transition",
+							"absolute inset-0 -right-[18px] flex select-none items-center justify-center text-lg font-bold leading-none text-white transition",
 							screen === "known" && "opacity-50"
 						)}
 					>
 						known
 						{knownUnread !== 0 && (
-							<div className="ml-1 h-[18px] w-[18px] animate-pulse rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
+							<div className="ml-1 h-[18px] w-[18px] animate-pulse select-none rounded-full bg-secondary pt-0.5 text-sm leading-none text-primary">
 								{knownUnread}
 							</div>
 						)}

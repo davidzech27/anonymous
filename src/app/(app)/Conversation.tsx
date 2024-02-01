@@ -256,29 +256,21 @@ export default function Conversation({
 												end: index + 1,
 											}
 										} else if (
-											selection.start - 1 === index &&
-											selection.end - 1 === index
+											index + 1 >= selection.start &&
+											index + 1 <= selection.end
 										) {
 											setShareLinkCopied(false)
 
 											return undefined
 										} else if (
-											index >= selection.start - 1 &&
-											index <= selection.end - 1
-										) {
-											return {
-												start: selection.start,
-												end: index + 1,
-											}
-										} else if (
-											index <
-											selection.start - 1
+											index + 1 <
+											selection.start
 										) {
 											return {
 												start: index + 1,
 												end: selection.end,
 											}
-										} else if (index > selection.end - 1) {
+										} else if (index + 1 > selection.end) {
 											return {
 												start: selection.start,
 												end: index + 1,

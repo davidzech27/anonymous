@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { Link, Mail } from "lucide-react"
+import { Link } from "lucide-react"
 
 import env from "~/env.mjs"
 import SnapShare from "~/components/SnapShare"
@@ -23,9 +23,9 @@ export default function InviteBar({ userId }: Props) {
 					)
 				}}
 				role="button"
-				className="flex items-center space-x-1 text-white hover:opacity-75"
+				className="flex items-center space-x-1.5 text-white hover:opacity-75"
 			>
-				<span className="text-sm font-bold mobile:text-[10px]">
+				<span className="text-sm font-bold">
 					{!inviteLinkCopied
 						? "copy invite link"
 						: "invite link copied"}
@@ -35,19 +35,6 @@ export default function InviteBar({ userId }: Props) {
 			</div>
 
 			<SnapShare url={`${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`} />
-
-			<a
-				href={`mailto:?subject=mchsanonymous&body=${encodeURIComponent(
-					`I'm inviting you to mchsanonymous. Join here: ${env.NEXT_PUBLIC_URL}/?invitedBy=${userId}`
-				)}`}
-				className="flex items-center space-x-1.5 text-white hover:opacity-75"
-			>
-				<span className="text-sm font-bold mobile:text-[10px]">
-					email invite
-				</span>
-
-				<Mail className="h-4 w-4" />
-			</a>
 		</div>
 	)
 }

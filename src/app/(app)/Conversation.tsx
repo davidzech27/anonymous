@@ -199,7 +199,7 @@ export default function Conversation({
 								)
 							}}
 							role="button"
-							className="flex select-none space-x-1 whitespace-pre text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:whitespace-pre-wrap mobile:text-base"
+							className="flex select-none space-x-1.5 whitespace-pre text-sm font-bold leading-none text-white transition hover:opacity-75 focus-visible:opacity-75 mobile:whitespace-pre-wrap mobile:text-base"
 						>
 							<span className="text-sm font-bold">
 								{!shareLinkCopied

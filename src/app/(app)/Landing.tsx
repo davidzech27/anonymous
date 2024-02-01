@@ -124,8 +124,8 @@ export default function Landing({
 		setSubmitting(true)
 
 		const response = await createUserAction({
-			firstName: fullNameInput.split(/\s/g)[0] ?? " ",
-			lastName: fullNameInput.split(/\s/g)?.slice(1).join(" ") ?? " ",
+			firstName: fullNameInput.split(/\s/g)[0] ?? "",
+			lastName: fullNameInput.split(/\s/g)?.slice(1).join(" ") || " ",
 			phoneNumber: Number(phoneNumberInput.match(/\d/g)?.join("")),
 			otp: otpInput.trim(),
 			smsNotificationConsent: smsNotificationConsentInput,
@@ -207,7 +207,7 @@ export default function Landing({
 							),
 							name: (
 								<h2 className="w-1/2 text-center text-4xl font-bold leading-normal text-secondary mobile:w-full mobile:text-2xl">
-									what&apos;s your name?
+									what&apos;s your full name?
 								</h2>
 							),
 							number: (
